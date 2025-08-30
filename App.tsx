@@ -6,7 +6,6 @@ import DashboardView from './components/views/DashboardView';
 import AuthView from './components/views/AuthView';
 import { Toaster } from 'react-hot-toast';
 import NewLandingView from './components/views/NewLandingView';
-import DemoDashboardView from './components/views/DemoDashboardView';
 import type { LifeData } from './types';
 import { supabase } from './lib/supabaseClient';
 
@@ -58,21 +57,16 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-    const [currentView, setCurrentView] = useState<'landing' | 'demo' | 'app'>('landing');
+    const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
 
     const handleStart = () => {
         setCurrentView('app');
     };
 
-    const handleSeeDemo = () => {
-        setCurrentView('demo');
-    };
-
     return (
         <>
             <Toaster />
-            {currentView === 'landing' && <NewLandingView onStart={handleStart} onSeeDemo={handleSeeDemo} />}
-            {currentView === 'demo' && <DemoDashboardView />}
+            {currentView === 'landing' && <NewLandingView onStart={handleStart} />}
             {currentView === 'app' && (
                 <AuthProvider>
                     <LifeDataProvider>
