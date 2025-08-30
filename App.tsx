@@ -4,7 +4,9 @@ import { AuthProvider, useAuth } from './hooks/useAuth.tsx';
 import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
 import AuthView from './components/views/AuthView';
+import { Toaster } from 'react-hot-toast';
 import NewLandingView from './components/views/NewLandingView';
+import DemoDashboardView from './components/views/DemoDashboardView';
 import type { LifeData } from './types';
 import { supabase } from './lib/supabaseClient';
 
@@ -56,22 +58,29 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-    const [showLanding, setShowLanding] = useState(true);
+    const [currentView, setCurrentView] = useState<'landing' | 'demo' | 'app'>('landing');
 
     const handleStart = () => {
-        setShowLanding(false);
+        setCurrentView('app');
     };
 
-    if (showLanding) {
-        return <NewLandingView onStart={handleStart} />;
-    }
+    const handleSeeDemo = () => {
+        setCurrentView('demo');
+    };
 
     return (
-        <AuthProvider>
-            <LifeDataProvider>
-                <AppContent />
-            </LifeDataProvider>
-        </AuthProvider>
+        <>
+            <Toaster />
+            {currentView === 'landing' && <NewLandingView onStart={handleStart} onSeeDemo={handleSeeDemo} />}
+            {currentView === 'demo' && <DemoDashboardView />}
+            {currentView === 'app' && (
+                <AuthProvider>
+                    <LifeDataProvider>
+                        <AppContent />
+                    </LifeDataProvider>
+                </AuthProvider>
+            )}
+        </>
     );
 };
 
