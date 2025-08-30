@@ -49,10 +49,8 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                             </button>
                         </motion.div>
                     </div>
-                    <div className="lg:w-1/2 h-full flex items-center justify-center">
-                        <div className="w-full h-[50vh] lg:h-[80vh]">
-                            <LifeOrb3D currentAge={25} targetAge={80} dominantColorActivity="Work/Study" />
-                        </div>
+                    <div className="absolute top-0 left-0 w-full h-full lg:w-1/2 lg:left-1/2">
+                        <LifeOrb3D currentAge={25} targetAge={80} dominantColorActivity="Work/Study" />
                     </div>
                 </div>
             </section>
