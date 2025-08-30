@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { LifeDataProvider, useLifeData } from './hooks/useLifeData.tsx';
 import { AuthProvider, useAuth } from './hooks/useAuth.tsx';
 import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
 import AuthView from './components/views/AuthView';
+import NewLandingView from './components/views/NewLandingView';
 import type { LifeData } from './types';
 import { supabase } from './lib/supabaseClient';
 
@@ -56,6 +56,16 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+    const [showLanding, setShowLanding] = useState(true);
+
+    const handleStart = () => {
+        setShowLanding(false);
+    };
+
+    if (showLanding) {
+        return <NewLandingView onStart={handleStart} />;
+    }
+
     return (
         <AuthProvider>
             <LifeDataProvider>
