@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLifeData } from '../../hooks/useLifeData';
+import { useLifeData } from '../../hooks/useLifeData.tsx';
 import type { LifeData, ActivityData } from '../../types';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
