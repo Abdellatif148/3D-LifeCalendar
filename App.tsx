@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LifeDataProvider, useLifeData } from './hooks/useLifeData.tsx';
-import { AuthProvider, useAuth } from './hooks/useAuth.tsx';
+import { AuthProvider, useAuth } from './hooks/useAuth';
 import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
 import AuthView from './components/views/AuthView';
