@@ -1,6 +1,6 @@
 import React, { Suspense, useState, useMemo } from 'react';
 import { useLifeData } from '../../hooks/useLifeData.tsx';
-import { useAuth } from '../../hooks/useAuth.tsx';
+import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabaseClient';
 import ControlPanel from '../dashboard/ControlPanel';
 import LifeOrb3D from '../dashboard/LifeOrb3D';
