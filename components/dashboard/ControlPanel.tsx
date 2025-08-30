@@ -80,8 +80,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activities, baseActivities,
                 
                 <div className="mt-6 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-lg border border-cyan-500/20">
                     <p className="text-xs text-gray-400 text-center">
-                        💡 <strong>Pro tip:</strong> Even 15 minutes daily compounds into weeks of lifetime impact
+                        🎯 Adjust sliders below to see how small changes reshape your life orb.
                     </p>
+                </div>
+
+                <div className="flex space-x-4 mt-6">
+                    <Button onClick={() => {}} variant="secondary" className="w-full">Reset to Default</Button>
+                    <Button onClick={() => {}} className="w-full">Suggest Optimal Routine</Button>
                 </div>
             </Card>
         </div>

@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
 import AuthView from './components/views/AuthView';
+import SettingsView from './components/views/SettingsView';
 import { Toaster } from 'react-hot-toast';
 import NewLandingView from './components/views/NewLandingView';
 import type { LifeData } from './types';
@@ -12,7 +13,7 @@ import { supabase } from './lib/supabaseClient';
 const AppContent: React.FC = () => {
     const { user, loading } = useAuth();
     const { lifeData, isInitialized } = useLifeData();
-    const [view, setView] = useState<'onboarding' | 'dashboard'>('onboarding');
+    const [view, setView] = useState<'onboarding' | 'dashboard' | 'settings'>('dashboard');
 
     useEffect(() => {
         if (!loading && user && isInitialized) {
@@ -26,6 +27,10 @@ const AppContent: React.FC = () => {
 
     const handleOnboardingComplete = (data: LifeData) => {
         setView('dashboard');
+    };
+
+    const handleNavigateToSettings = () => {
+        setView('settings');
     };
 
     const handleLogout = async () => {
@@ -47,7 +52,9 @@ const AppContent: React.FC = () => {
                     case 'onboarding':
                         return <OnboardingView onComplete={handleOnboardingComplete} />;
                     case 'dashboard':
-                        return <DashboardView onLogout={handleLogout} />;
+                        return <DashboardView onLogout={handleLogout} onNavigateToSettings={handleNavigateToSettings} />;
+                    case 'settings':
+                        return <SettingsView />;
                     default:
                         return <OnboardingView onComplete={handleOnboardingComplete} />;
                 }

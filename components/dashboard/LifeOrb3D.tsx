@@ -146,23 +146,36 @@ interface LifeOrb3DProps {
     currentAge: number;
     targetAge: number;
     dominantColorActivity: CategoryName;
+    enableZoom?: boolean;
+    density?: number;
 }
 
-const LifeOrb3D: React.FC<LifeOrb3DProps> = (props) => {
+const LifeOrb3D: React.FC<LifeOrb3DProps> = ({ enableZoom = true, density = 1, ...props }) => {
     return (
         <Canvas
             camera={{ position: [0, 0, 12], fov: 50 }}
             style={{ background: 'transparent' }}
         >
-            <ambientLight intensity={0.4} />
-            <pointLight position={[10, 10, 10]} intensity={1.5} color="#22D3EE" />
-            <pointLight position={[-10, -10, -10]} intensity={0.8} color="#8B5CF6" />
-            <pointLight position={[0, 15, 0]} intensity={0.6} color="#FFFFFF" />
+            <ambientLight intensity={0.4 * density} />
+            <pointLight position={[10, 10, 10]} intensity={1.5 * density} color="#22D3EE" />
+            <pointLight position={[-10, -10, -10]} intensity={0.8 * density} color="#8B5CF6" />
+            <pointLight position={[0, 15, 0]} intensity={0.6 * density} color="#FFFFFF" />
             
+            <Text
+                position={[0, 0, -6]}
+                fontSize={0.3}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                opacity={0.5}
+            >
+                Each dot = 1 week
+            </Text>
+
             <OrbParticleSystem {...props} />
             
             <OrbitControls
-                enableZoom={true}
+                enableZoom={enableZoom}
                 enablePan={true}
                 minDistance={6}
                 maxDistance={20}
