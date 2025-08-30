@@ -4,15 +4,17 @@ import type { LifeData, ActivityData } from '../../types';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { MINUTES_IN_DAY, CATEGORY_MAP } from '../../constants';
+import toast from 'react-hot-toast';
 
 interface OnboardingViewProps {
     onComplete: (data: LifeData) => void;
 }
 
 const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
-    const { lifeData, setLifeData } = useLifeData();
+    const { lifeData, setLifeData, saveLifeData } = useLifeData();
     const [localData, setLocalData] = useState(lifeData);
     const [step, setStep] = useState(1);
+    const [loading, setLoading] = useState(false);
     
     const handleActivityChange = (name: string, hours: number) => {
         const minutes = hours * 60;
@@ -35,10 +37,21 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
         setLocalData(prev => ({ ...prev, activities: finalActivities }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLifeData(localData);
-        onComplete(localData);
+        setLoading(true);
+        
+        try {
+            setLifeData(localData);
+            await saveLifeData();
+            toast.success('Your life orb has been created!');
+            onComplete(localData);
+        } catch (error) {
+            console.error('Error saving onboarding data:', error);
+            toast.error('Failed to save your data. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const totalHours = localData.activities.reduce((sum, act) => sum + act.minutesPerDay, 0) / 60;
@@ -200,15 +213,16 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                                     onClick={() => setStep(1)} 
                                     variant="secondary" 
                                     className="flex-1"
+                                    disabled={loading}
                                 >
                                     Back
                                 </Button>
                                 <Button 
                                     type="submit" 
                                     className="flex-1 text-lg glow-effect"
-                                    disabled={!isBalanced}
+                                    disabled={!isBalanced || loading}
                                 >
-                                    Generate My Life Orb
+                                    {loading ? 'Creating...' : 'Generate My Life Orb'}
                                 </Button>
                             </div>
                         </form>

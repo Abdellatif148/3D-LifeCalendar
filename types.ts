@@ -1,4 +1,3 @@
-
 export type CategoryName = 'Sleep' | 'Work/Study' | 'Social' | 'Hobbies' | 'Exercise' | 'Unallocated';
 
 export interface Category {
@@ -21,4 +20,11 @@ export interface LifeData {
 export interface Delta {
     name: CategoryName;
     deltaMinutes: number;
+}
+
+export interface Profile {
+    id: string;
+    life_data: LifeData | null;
+    created_at: string;
+    updated_at: string;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import Card from '../ui/Card';
 import Slider from '../ui/Slider';
+import Button from '../ui/Button';
 import { CATEGORY_MAP } from '../../constants';
 import type { ActivityData, CategoryName } from '../../types';
 
@@ -8,9 +9,10 @@ interface ControlPanelProps {
     activities: (ActivityData & { displayTime: string })[];
     baseActivities: ActivityData[];
     onSliderChange: (name: CategoryName, deltaMinutes: number) => void;
+    onResetToDefault: () => void;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ activities, baseActivities, onSliderChange }) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({ activities, baseActivities, onSliderChange, onResetToDefault }) => {
     
     return (
         <div className="space-y-6">
@@ -85,8 +87,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activities, baseActivities,
                 </div>
 
                 <div className="flex space-x-4 mt-6">
-                    <Button onClick={() => {}} variant="secondary" className="w-full">Reset to Default</Button>
-                    <Button onClick={() => {}} className="w-full">Suggest Optimal Routine</Button>
+                    <Button onClick={onResetToDefault} variant="secondary" className="w-full">
+                        Reset to Default
+                    </Button>
                 </div>
             </Card>
         </div>

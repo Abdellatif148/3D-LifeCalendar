@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { LifeData, ActivityData, CategoryName } from '../types';
 import { MINUTES_IN_DAY } from '../constants';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './useAuth';
+import toast from 'react-hot-toast';
 
 const getInitialLifeData = (): LifeData => ({
     currentAge: 0,
@@ -21,9 +21,11 @@ const getInitialLifeData = (): LifeData => ({
 interface LifeDataContextType {
     lifeData: LifeData;
     isInitialized: boolean;
+    loading: boolean;
     setLifeData: React.Dispatch<React.SetStateAction<LifeData>>;
     updateActivity: (name: CategoryName, minutes: number) => void;
     baseActivities: ActivityData[];
+    saveLifeData: () => Promise<void>;
 }
 
 const LifeDataContext = createContext<LifeDataContextType | undefined>(undefined);
@@ -33,14 +35,18 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lifeData, setLifeData] = useState<LifeData>(getInitialLifeData());
     const [baseActivities, setBaseActivities] = useState<ActivityData[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchLifeData = async () => {
             if (!user) {
+                setLifeData(getInitialLifeData());
+                setBaseActivities(getInitialLifeData().activities);
                 setIsInitialized(true);
                 return;
             }
 
+            setLoading(true);
             try {
                 const { data, error } = await supabase
                     .from('profiles')
@@ -48,20 +54,33 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     .eq('id', user.id)
                     .single();
 
-                if (error && error.code !== 'PGRST116') { // Ignore 'Range not found' error
-                    throw error;
-                }
-
-                if (data && data.life_data) {
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // No profile found, create one
+                        const { error: insertError } = await supabase
+                            .from('profiles')
+                            .insert({ id: user.id, life_data: null });
+                        
+                        if (insertError) {
+                            console.error('Error creating profile:', insertError);
+                        }
+                        setBaseActivities(getInitialLifeData().activities);
+                    } else {
+                        throw error;
+                    }
+                } else if (data && data.life_data) {
                     setLifeData(data.life_data);
                     setBaseActivities(data.life_data.activities);
                 } else {
                     setBaseActivities(getInitialLifeData().activities);
                 }
+
             } catch (error) {
-                console.error("Failed to fetch lifeData from Supabase", error);
+                console.error('Failed to fetch life data:', error);
+                toast.error('Failed to load your data');
                 setBaseActivities(getInitialLifeData().activities);
             } finally {
+                setLoading(false);
                 setIsInitialized(true);
             }
         };
@@ -69,21 +88,39 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         fetchLifeData();
     }, [user]);
 
-    useEffect(() => {
-        const saveLifeData = async () => {
-            if (!user || !isInitialized) return;
+    const saveLifeData = useCallback(async () => {
+        if (!user || !isInitialized) return;
 
-            try {
-                await supabase
-                    .from('profiles')
-                    .upsert({ id: user.id, life_data: lifeData });
-            } catch (error) {
-                console.error("Failed to save lifeData to Supabase", error);
-            }
-        };
-
-        saveLifeData();
+        setLoading(true);
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .upsert({ 
+                    id: user.id, 
+                    life_data: lifeData,
+                    updated_at: new Date().toISOString()
+                });
+            
+            if (error) throw error;
+        } catch (error) {
+            console.error('Failed to save life data:', error);
+            toast.error('Failed to save your changes');
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     }, [lifeData, user, isInitialized]);
+
+    // Auto-save with debouncing
+    useEffect(() => {
+        if (!user || !isInitialized || lifeData.currentAge === 0) return;
+
+        const timeoutId = setTimeout(() => {
+            saveLifeData().catch(console.error);
+        }, 1000); // Debounce saves by 1 second
+
+        return () => clearTimeout(timeoutId);
+    }, [lifeData, user, isInitialized, saveLifeData]);
 
     const updateActivity = useCallback((name: CategoryName, minutes: number) => {
         setLifeData(prevData => {
@@ -105,7 +142,15 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         });
     }, []);
 
-    const value = { lifeData, isInitialized, setLifeData, updateActivity, baseActivities };
+    const value = { 
+        lifeData, 
+        isInitialized, 
+        loading,
+        setLifeData, 
+        updateActivity, 
+        baseActivities,
+        saveLifeData
+    };
 
     return <LifeDataContext.Provider value={value}>{children}</LifeDataContext.Provider>;
 };

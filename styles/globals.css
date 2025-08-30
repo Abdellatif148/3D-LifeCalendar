@@ -2,15 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: #0F172A;
     color: white;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Poppins', sans-serif;
+    line-height: 1.2;
 }
 
 @keyframes aurora {
@@ -42,4 +49,28 @@ h1, h2, h3, h4, h5, h6 {
 
 .pulse-glow {
     animation: pulse 4s infinite;
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+    .grid-cols-12 {
+        grid-template-columns: 1fr;
+    }
+    
+    .lg\:col-span-3,
+    .lg\:col-span-6 {
+        grid-column: span 1;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid #22D3EE;
+    outline-offset: 2px;
 }

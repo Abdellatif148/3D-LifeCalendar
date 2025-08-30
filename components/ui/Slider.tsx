@@ -33,7 +33,7 @@ const Slider: React.FC<SliderProps> = ({ label, valueLabel, color, style, ...pro
                 style={customStyle}
                 {...props}
             />
-            <style>{`
+            <style suppressHydrationWarning>{`
                 .slider::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
@@ -60,11 +60,20 @@ const Slider: React.FC<SliderProps> = ({ label, valueLabel, color, style, ...pro
                     cursor: pointer;
                     border: 3px solid white;
                     box-shadow: 0 0 15px var(--thumb-color);
+                    -moz-appearance: none;
                 }
 
                 .slider::-webkit-slider-track {
-                    background: linear-gradient(to right, var(--track-color) 0%, var(--track-color) var(--progress, 50%), rgba(75, 85, 99, 0.5) var(--progress, 50%), rgba(75, 85, 99, 0.5) 100%);
+                    background: rgba(75, 85, 99, 0.5);
                     border-radius: 6px;
+                    height: 12px;
+                }
+                
+                .slider::-moz-range-track {
+                    background: rgba(75, 85, 99, 0.5);
+                    border-radius: 6px;
+                    height: 12px;
+                    border: none;
                 }
             `}</style>
         </div>

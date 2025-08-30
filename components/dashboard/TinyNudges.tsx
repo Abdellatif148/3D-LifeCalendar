@@ -36,33 +36,41 @@ const TinyNudges: React.FC<TinyNudgesProps> = ({ deltas }) => {
             <Button
                 className="w-full mb-2"
                 disabled={totalDeltaMinutes === 0}
-                    onClick={() => {
-                        const cal = [
-                            'BEGIN:VCALENDAR',
-                            'VERSION:2.0',
-                            'PRODID:-//LifeCalendar//EN',
-                            ...deltas.map(delta => {
-                                return [
-                                    'BEGIN:VEVENT',
-                                    `UID:${new Date().getTime()}@lifecalendar.com`,
-                                    `DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}`,
-                                    `SUMMARY:Life Calendar Nudge: ${delta.name}`,
-                                    `DESCRIPTION:A reminder to spend time on ${delta.name}.`,
-                                    'RRULE:FREQ=DAILY',
-                                    'END:VEVENT'
-                                ].join('\\n');
-                            }),
-                            'END:VCALENDAR'
-                        ].join('\\n');
+                onClick={() => {
+                    const cal = [
+                        'BEGIN:VCALENDAR',
+                        'VERSION:2.0',
+                        'PRODID:-//LifeCalendar//EN',
+                        ...deltas.map((delta, index) => {
+                            const now = new Date();
+                            const eventDate = new Date(now.getTime() + (index * 24 * 60 * 60 * 1000)); // Stagger events
+                            const dateStr = eventDate.toISOString().replace(/[-:.]/g, '').split('T')[0];
+                            
+                            return [
+                                'BEGIN:VEVENT',
+                                `UID:${now.getTime()}-${index}@lifecalendar.com`,
+                                `DTSTAMP:${now.toISOString().replace(/[-:.]/g, '')}`,
+                                `DTSTART:${dateStr}T090000Z`,
+                                `DTEND:${dateStr}T091500Z`,
+                                `SUMMARY:Life Nudge: ${delta.name}`,
+                                `DESCRIPTION:Reminder to adjust your ${delta.name} routine by ${(delta.deltaMinutes / 60).toFixed(1)} hours.`,
+                                'RRULE:FREQ=DAILY;COUNT=30',
+                                'END:VEVENT'
+                            ].join('\r\n');
+                        }),
+                        'END:VCALENDAR'
+                    ].join('\r\n');
 
-                        const blob = new Blob([cal], { type: 'text/calendar' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'lifecalendar-nudges.ics';
-                        a.click();
-                        URL.revokeObjectURL(url);
-                    }}
+                    const blob = new Blob([cal], { type: 'text/calendar;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'life-optimizer-nudges.ics';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }}
             >
                 📅 Export Nudge Calendar
             </Button>

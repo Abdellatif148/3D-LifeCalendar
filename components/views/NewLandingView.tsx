@@ -17,13 +17,13 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                 <div className="absolute inset-0 aurora-background opacity-70"></div>
                 <div className="absolute inset-0 bg-black/30"></div>
 
-                <div className="relative z-10 container mx-auto px-4 flex flex-col lg:flex-row items-center">
+                <div className="relative z-10 container mx-auto px-4 flex flex-col lg:flex-row items-center h-full">
                     <div className="lg:w-1/2 text-center lg:text-left">
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
-                            className="text-6xl font-extrabold text-white"
+                            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight"
                         >
                             See your life in time. Change it in minutes.
                         </motion.h1>
@@ -31,7 +31,7 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="mt-4 text-xl text-white/80"
+                            className="mt-4 text-lg sm:text-xl text-white/80 max-w-lg"
                         >
                             An interactive calendar that shows how your habits steal or gift you years.
                         </motion.p>
@@ -39,17 +39,23 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
-                            className="mt-8 flex justify-center lg:justify-start space-x-4"
+                            className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4"
                         >
-                            <button onClick={onStart} className="px-8 py-3 bg-gradient-to-r from-[#22D3EE] to-[#8B5CF6] text-white font-bold rounded-full pulse-glow transition-transform hover:scale-105">
+                            <button 
+                                onClick={onStart} 
+                                className="px-8 py-3 bg-gradient-to-r from-[#22D3EE] to-[#8B5CF6] text-white font-bold rounded-full pulse-glow transition-transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-400/50"
+                            >
                                 Start Free
                             </button>
-                            <button onClick={onStart} className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white">
+                            <button 
+                                onClick={onStart} 
+                                className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white focus:outline-none focus:ring-4 focus:ring-white/50"
+                            >
                                 Login
                             </button>
                         </motion.div>
                     </div>
-                    <div className="absolute top-0 left-0 w-full h-full lg:w-3/5 lg:left-2/5">
+                    <div className="hidden lg:block absolute top-0 left-0 w-full h-full lg:w-3/5 lg:left-2/5">
                         <LifeOrb3D currentAge={25} targetAge={80} dominantColorActivity="Work/Study" enableZoom={false} />
                     </div>
                 </div>
@@ -58,7 +64,7 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
             {/* Feature Section */}
             <section className="py-20 bg-[#0F172A]">
                 <div className="container mx-auto px-4">
-                    <div className="grid md:grid-cols-3 gap-12">
+                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
                         {/* Feature 1 */}
                         <motion.div
                             className="bg-white/5 p-8 rounded-2xl shadow-lg backdrop-blur-md border border-white/10"
@@ -85,13 +91,16 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                             whileHover={{ scale: 1.05, rotateZ: -1 }}
                         >
                             <div className="w-full h-48 bg-black/20 rounded-lg p-4">
-                                <p className="text-center text-lg text-red-400">-1h TikTok</p>
+                                <div className="text-center space-y-3">
+                                    <p className="text-lg text-red-400 font-semibold">-1h Social Media</p>
                                 <div className="w-full h-2 bg-gray-600 rounded-full my-4">
                                     <div className="w-1/2 h-full bg-red-400 rounded-full"></div>
                                 </div>
-                                <p className="text-center text-lg text-green-400">+2 years Reading</p>
+                                    <p className="text-lg text-green-400 font-semibold">+1h Reading</p>
                                 <div className="w-full h-2 bg-gray-600 rounded-full my-4">
                                     <div className="w-3/4 h-full bg-green-400 rounded-full"></div>
+                                </div>
+                                    <p className="text-sm text-cyan-400">= +2.5 years gained</p>
                                 </div>
                             </div>
                             <h3 className="text-2xl font-bold text-white mt-6">Simulate Habits</h3>
@@ -131,12 +140,21 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
             {/* CTA Section */}
             <section className="py-20 bg-[#0F172A]">
                 <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-extrabold text-white">Your life is made of weeks. Don’t waste them.</h2>
-                    <div className="mt-8 flex justify-center space-x-4">
-                        <button onClick={onStart} className="px-8 py-3 bg-gradient-to-r from-[#22D3EE] to-[#8B5CF6] text-white font-bold rounded-full pulse-glow transition-transform hover:scale-105">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Your life is made of weeks. Don't waste them.</h2>
+                    <p className="text-lg text-white/70 mb-8 max-w-2xl mx-auto">
+                        Start optimizing your time today and watch how small changes create massive lifetime impact.
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button 
+                            onClick={onStart} 
+                            className="px-8 py-3 bg-gradient-to-r from-[#22D3EE] to-[#8B5CF6] text-white font-bold rounded-full pulse-glow transition-transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-400/50"
+                        >
                             Start Free
                         </button>
-                        <button onClick={onStart} className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white">
+                        <button 
+                            onClick={onStart} 
+                            className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white focus:outline-none focus:ring-4 focus:ring-white/50"
+                        >
                             Login
                         </button>
                     </div>
@@ -146,7 +164,7 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
             {/* Footer */}
             <footer className="bg-[#0F172A] border-t border-white/10 py-8">
                 <div className="container mx-auto px-4 text-center text-white/60">
-                    <div className="flex justify-center space-x-6 mb-4">
+                    <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6 mb-4 text-sm">
                         <a>Product</a>
                         <a>Features</a>
                         <a>Pricing</a>
@@ -156,7 +174,7 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                         <a>Contact</a>
                         <a>Blog</a>
                     </div>
-                    <p>© 2025 LifeCalendar. All rights reserved.</p>
+                    <p className="text-sm">© 2025 3D Time Optimizer. All rights reserved.</p>
                 </div>
             </footer>
         </div>

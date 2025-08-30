@@ -14,7 +14,6 @@ interface OrbParticleSystemProps {
 const OrbParticleSystem: React.FC<OrbParticleSystemProps> = ({ currentAge, targetAge, dominantColorActivity }) => {
     const particlesRef = useRef<THREE.Points>(null!);
     const orbRef = useRef<THREE.Mesh>(null!);
-    const [hoveredWeek, setHoveredWeek] = React.useState<{ year: number; week: number; position: THREE.Vector3 } | null>(null);
 
     useFrame((state) => {
         if (particlesRef.current) {
@@ -130,14 +129,6 @@ const OrbParticleSystem: React.FC<OrbParticleSystemProps> = ({ currentAge, targe
                 Target: {targetAge} years
             </Text>
             
-            {/* Tooltip for hovered week */}
-            {hoveredWeek && (
-                <Html position={hoveredWeek.position.toArray()}>
-                    <div className="bg-black/80 text-white p-2 rounded text-xs whitespace-nowrap pointer-events-none">
-                        Year {hoveredWeek.year}, Week {hoveredWeek.week}
-                    </div>
-                </Html>
-            )}
         </group>
     );
 };
