@@ -150,56 +150,26 @@ interface LifeOrb3DProps {
 
 const LifeOrb3D: React.FC<LifeOrb3DProps> = (props) => {
     return (
-        <div className="relative h-full bg-gradient-to-b from-gray-900 to-black">
-            {/* Starfield background */}
-            <div className="absolute inset-0 bg-starfield opacity-20"></div>
+        <Canvas
+            camera={{ position: [0, 0, 12], fov: 50 }}
+            style={{ background: 'transparent' }}
+        >
+            <ambientLight intensity={0.4} />
+            <pointLight position={[10, 10, 10]} intensity={1.5} color="#22D3EE" />
+            <pointLight position={[-10, -10, -10]} intensity={0.8} color="#8B5CF6" />
+            <pointLight position={[0, 15, 0]} intensity={0.6} color="#FFFFFF" />
             
-            <Canvas 
-                camera={{ position: [0, 0, 12], fov: 50 }}
-                style={{ background: 'transparent' }}
-            >
-                <ambientLight intensity={0.4} />
-                <pointLight position={[10, 10, 10]} intensity={1.5} color="#22D3EE" />
-                <pointLight position={[-10, -10, -10]} intensity={0.8} color="#8B5CF6" />
-                <pointLight position={[0, 15, 0]} intensity={0.6} color="#FFFFFF" />
-                
-                <OrbParticleSystem {...props} />
-                
-                <OrbitControls 
-                    enableZoom={true} 
-                    enablePan={true}
-                    minDistance={6}
-                    maxDistance={20}
-                    zoomSpeed={0.8}
-                    rotateSpeed={0.5}
-                />
-            </Canvas>
+            <OrbParticleSystem {...props} />
             
-            {/* Floating UI elements */}
-            <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white text-sm">
-                <p className="font-semibold">Your Life Orb</p>
-                <p className="text-gray-300">Drag to rotate • Scroll to zoom</p>
-            </div>
-            
-            <style>{`
-                .bg-starfield {
-                    background-image: 
-                        radial-gradient(1px 1px at 20px 30px, #fff, transparent),
-                        radial-gradient(1px 1px at 40px 70px, rgba(34, 211, 238, 0.8), transparent),
-                        radial-gradient(1px 1px at 90px 40px, rgba(139, 92, 246, 0.6), transparent),
-                        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.4), transparent),
-                        radial-gradient(1px 1px at 160px 30px, rgba(34, 211, 238, 0.3), transparent);
-                    background-repeat: repeat;
-                    background-size: 200px 100px;
-                    animation: starfield-drift 20s linear infinite;
-                }
-                
-                @keyframes starfield-drift {
-                    from { background-position: 0 0; }
-                    to { background-position: 200px 100px; }
-                }
-            `}</style>
-        </div>
+            <OrbitControls
+                enableZoom={true}
+                enablePan={true}
+                minDistance={6}
+                maxDistance={20}
+                zoomSpeed={0.8}
+                rotateSpeed={0.5}
+            />
+        </Canvas>
     );
 };
 
