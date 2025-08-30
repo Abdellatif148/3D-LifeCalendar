@@ -6,10 +6,9 @@ import ParticleBackground from '../ui/ParticleBackground';
 
 interface NewLandingViewProps {
     onStart: () => void;
-    onSeeDemo: () => void;
 }
 
-const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart, onSeeDemo }) => {
+const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
     return (
         <div className="bg-[#0F172A] text-white min-h-screen">
             {/* Hero Section */}
@@ -45,8 +44,8 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart, onSeeDemo }) =
                             <button onClick={onStart} className="px-8 py-3 bg-gradient-to-r from-[#22D3EE] to-[#8B5CF6] text-white font-bold rounded-full pulse-glow transition-transform hover:scale-105">
                                 Start Free
                             </button>
-                            <button onClick={onSeeDemo} className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white">
-                                See Demo
+                            <button onClick={onStart} className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white">
+                                Login
                             </button>
                         </motion.div>
                     </div>
@@ -139,8 +138,8 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart, onSeeDemo }) =
                         <button onClick={onStart} className="px-8 py-3 bg-gradient-to-r from-[#22D3EE] to-[#8B5CF6] text-white font-bold rounded-full pulse-glow transition-transform hover:scale-105">
                             Start Free
                         </button>
-                        <button onClick={onSeeDemo} className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white">
-                            See Demo
+                        <button onClick={onStart} className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-full transition-all hover:bg-white/10 hover:border-white">
+                            Login
                         </button>
                     </div>
                 </div>
