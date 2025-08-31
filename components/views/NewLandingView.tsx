@@ -3,16 +3,20 @@ import { motion } from 'framer-motion';
 import LifeOrb3D from '../dashboard/LifeOrb3D';
 import CubeGridPreview from '../ui/CubeGridPreview';
 import ParticleBackground from '../ui/ParticleBackground';
+import Navigation from '../ui/Navigation';
 
 interface NewLandingViewProps {
     onStart: () => void;
+    onNavigate: (view: string) => void;
 }
 
-const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
+const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart, onNavigate }) => {
     return (
         <div className="bg-[#0F172A] text-white min-h-screen">
+            <Navigation onNavigate={onNavigate} currentView="landing" />
+            
             {/* Hero Section */}
-            <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+            <section className="relative w-full h-screen flex items-center justify-center overflow-hidden pt-16">
                 <ParticleBackground />
                 <div className="absolute inset-0 aurora-background opacity-70"></div>
                 <div className="absolute inset-0 bg-black/30"></div>
@@ -55,7 +59,7 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
                             </button>
                         </motion.div>
                     </div>
-                    <div className="hidden lg:block absolute top-0 left-0 w-full h-full lg:w-3/5 lg:left-2/5">
+                    <div className="hidden lg:block lg:w-1/2">
                         <LifeOrb3D currentAge={25} targetAge={80} dominantColorActivity="Work/Study" enableZoom={false} />
                     </div>
                 </div>
@@ -165,14 +169,14 @@ const NewLandingView: React.FC<NewLandingViewProps> = ({ onStart }) => {
             <footer className="bg-[#0F172A] border-t border-white/10 py-8">
                 <div className="container mx-auto px-4 text-center text-white/60">
                     <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6 mb-4 text-sm">
-                        <a>Product</a>
-                        <a>Features</a>
-                        <a>Pricing</a>
-                        <a>API</a>
-                        <a>Company</a>
-                        <a>Careers</a>
-                        <a>Contact</a>
-                        <a>Blog</a>
+                        <button onClick={() => onNavigate('product')} className="hover:text-white transition-colors">Product</button>
+                        <button onClick={() => onNavigate('features')} className="hover:text-white transition-colors">Features</button>
+                        <button onClick={() => onNavigate('pricing')} className="hover:text-white transition-colors">Pricing</button>
+                        <button onClick={() => onNavigate('api')} className="hover:text-white transition-colors">API</button>
+                        <button onClick={() => onNavigate('company')} className="hover:text-white transition-colors">Company</button>
+                        <button onClick={() => onNavigate('careers')} className="hover:text-white transition-colors">Careers</button>
+                        <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">Contact</button>
+                        <button onClick={() => onNavigate('blog')} className="hover:text-white transition-colors">Blog</button>
                     </div>
                     <p className="text-sm">© 2025 3D Time Optimizer. All rights reserved.</p>
                 </div>

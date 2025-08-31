@@ -7,6 +7,14 @@ import AuthView from './components/views/AuthView';
 import SettingsView from './components/views/SettingsView';
 import { Toaster } from 'react-hot-toast';
 import NewLandingView from './components/views/NewLandingView';
+import ProductView from './components/views/ProductView';
+import FeaturesView from './components/views/FeaturesView';
+import PricingView from './components/views/PricingView';
+import APIView from './components/views/APIView';
+import CompanyView from './components/views/CompanyView';
+import CareersView from './components/views/CareersView';
+import ContactView from './components/views/ContactView';
+import BlogView from './components/views/BlogView';
 import type { LifeData } from './types';
 
 const AppContent: React.FC = () => {
@@ -70,10 +78,14 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-    const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
+    const [currentView, setCurrentView] = useState<'landing' | 'app' | 'product' | 'features' | 'pricing' | 'api' | 'company' | 'careers' | 'contact' | 'blog'>('landing');
 
     const handleStart = () => {
         setCurrentView('app');
+    };
+
+    const handleNavigate = (view: typeof currentView) => {
+        setCurrentView(view);
     };
 
     return (
@@ -101,7 +113,15 @@ const App: React.FC = () => {
                     },
                 }}
             />
-            {currentView === 'landing' && <NewLandingView onStart={handleStart} />}
+            {currentView === 'landing' && <NewLandingView onStart={handleStart} onNavigate={handleNavigate} />}
+            {currentView === 'product' && <ProductView onNavigate={handleNavigate} />}
+            {currentView === 'features' && <FeaturesView onNavigate={handleNavigate} />}
+            {currentView === 'pricing' && <PricingView onNavigate={handleNavigate} />}
+            {currentView === 'api' && <APIView onNavigate={handleNavigate} />}
+            {currentView === 'company' && <CompanyView onNavigate={handleNavigate} />}
+            {currentView === 'careers' && <CareersView onNavigate={handleNavigate} />}
+            {currentView === 'contact' && <ContactView onNavigate={handleNavigate} />}
+            {currentView === 'blog' && <BlogView onNavigate={handleNavigate} />}
             {currentView === 'app' && (
                 <AuthProvider>
                     <LifeDataProvider>
