@@ -1,66 +1,57 @@
+
 import React, { useMemo } from 'react';
 import Card from '../ui/Card';
+import Button from '../ui/Button';
 import type { Delta } from '../../types';
 
 interface MetricsPanelProps {
     deltas: Delta[];
     yearsLeft: number;
-    lifeExpectancyChange: number;
 }
 
-const MetricsPanel: React.FC<MetricsPanelProps> = ({ deltas, yearsLeft, lifeExpectancyChange }) => {
-    const isPositive = lifeExpectancyChange >= 0;
-    const impactColor = isPositive ? 'text-green-400' : 'text-red-400';
-    const impactBgColor = isPositive ? 'bg-green-400/20' : 'bg-red-400/20';
-    const impactBorderColor = isPositive ? 'border-green-400/30' : 'border-red-400/30';
+const MetricsPanel: React.FC<MetricsPanelProps> = ({ deltas, yearsLeft }) => {
+    const { annualHoursGained, lifetimeDaysGained, totalDeltaMinutes } = useMemo(() => {
+        const totalDeltaMinutes = deltas.reduce((sum, delta) => sum + delta.deltaMinutes, 0);
+        const annualHoursGained = (totalDeltaMinutes * 365) / 60;
+        const lifetimeDaysGained = (annualHoursGained * yearsLeft) / 24;
+        return { totalDeltaMinutes, annualHoursGained, lifetimeDaysGained };
+    }, [deltas, yearsLeft]);
 
-    const totalDeltaHours = useMemo(() => {
-        return deltas.reduce((sum, delta) => sum + delta.deltaMinutes, 0) / 60;
-    }, [deltas]);
+    const gainOrLossText = totalDeltaMinutes >= 0 ? 'Gained' : 'Reallocated';
+    const gainOrLossColor = totalDeltaMinutes >= 0 ? 'text-green-400' : 'text-yellow-400';
+
     return (
-        <Card>
-                <h3 className="text-xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">
-                    Lifetime Impact
-                </h3>
-                
-                <div className={`text-center p-4 rounded-lg ${impactBgColor} border ${impactBorderColor} mb-4`}>
-                    <p className="text-sm text-gray-300">Your Life Expectancy</p>
-                    <p className="text-2xl font-bold text-white mb-2">
-                        {(yearsLeft + lifeExpectancyChange).toFixed(1)} years
-                    </p>
-                    <p className={`text-lg font-semibold ${impactColor}`}>
-                        ({isPositive ? '+' : ''}{lifeExpectancyChange.toFixed(1)} year gain)
-                    </p>
-                </div>
-                
-                {deltas.length > 0 && (
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-semibold text-gray-300">Daily Changes:</h4>
-                        {deltas.map(delta => (
-                            <div key={delta.name} className="flex justify-between items-center text-sm">
-                                <span className="text-gray-400">{delta.name}</span>
-                                <span className={delta.deltaMinutes > 0 ? 'text-green-400' : 'text-yellow-400'}>
-                                    {delta.deltaMinutes > 0 ? '+' : ''}{(delta.deltaMinutes / 60).toFixed(1)}h
-                                </span>
-                            </div>
-                        ))}
-                        <div className="border-t border-gray-600 pt-2 mt-2">
-                            <div className="flex justify-between items-center text-sm font-semibold">
-                                <span className="text-white">Total Daily Change:</span>
-                                <span className={totalDeltaHours > 0 ? 'text-green-400' : totalDeltaHours < 0 ? 'text-red-400' : 'text-gray-400'}>
-                                    {totalDeltaHours > 0 ? '+' : ''}{totalDeltaHours.toFixed(1)}h
-                                </span>
-                            </div>
-                        </div>
+        <div className="space-y-6">
+            <Card>
+                <h3 className="text-lg font-bold mb-4">Lifetime Impact</h3>
+                <div className="space-y-4">
+                    <div className="text-center">
+                        <p className="text-sm text-gray-400">Annual Hours {gainOrLossText}</p>
+                        <p className={`text-4xl font-bold ${gainOrLossColor}`}>{annualHoursGained.toFixed(1)}</p>
                     </div>
-                )}
-                
-                <div className="mt-4 p-3 bg-gray-700/30 rounded-lg">
-                    <p className="text-xs text-gray-400 text-center">
-                        💡 Small daily changes compound into years of life gained or lost
-                    </p>
+                    <div className="text-center">
+                        <p className="text-sm text-gray-400">Lifetime Days {gainOrLossText}</p>
+                        <p className={`text-4xl font-bold ${gainOrLossColor}`}>{lifetimeDaysGained.toFixed(1)}</p>
+                    </div>
                 </div>
-        </Card>
+            </Card>
+            <Card>
+                <h3 className="text-lg font-bold mb-4">Create a Tiny Plan</h3>
+                <p className="text-sm text-gray-400 mb-4">Turn your simulation into action. Create a recurring calendar event to nudge you towards your new goals.</p>
+                <Button className="w-full" disabled={totalDeltaMinutes === 0}>
+                    Export .ICS Nudges
+                </Button>
+                <p className="text-xs text-gray-500 mt-2 text-center">ICS export functionality coming soon.</p>
+            </Card>
+             <Card>
+                <h3 className="text-lg font-bold mb-4">Sync Your Data</h3>
+                <p className="text-sm text-gray-400 mb-4">Sign in to save your baselines and plans across devices.</p>
+                <Button variant="secondary" className="w-full">
+                    Sign In with Supabase
+                </Button>
+                 <p className="text-xs text-gray-500 mt-2 text-center">Supabase integration coming soon.</p>
+            </Card>
+        </div>
     );
 };
 

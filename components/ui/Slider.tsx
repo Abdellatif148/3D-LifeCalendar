@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface SliderProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -10,70 +11,42 @@ const Slider: React.FC<SliderProps> = ({ label, valueLabel, color, style, ...pro
     const customStyle = {
         ...style,
         '--thumb-color': color,
-        '--track-color': color,
     } as React.CSSProperties;
 
     return (
         <div className="w-full">
-            <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-semibold text-gray-200">{label}</label>
-                <span 
-                    className="text-sm font-bold text-black px-3 py-1 rounded-full shadow-lg" 
-                    style={{ 
-                        backgroundColor: color,
-                        boxShadow: `0 0 15px ${color}40`
-                    }}
-                >
-                    {valueLabel}
-                </span>
+            <div className="flex justify-between items-center mb-1">
+                <label className="text-sm font-medium text-gray-300">{label}</label>
+                <span className="text-sm font-semibold text-white px-2 py-0.5 rounded" style={{ backgroundColor: color }}>{valueLabel}</span>
             </div>
             <input
                 type="range"
-                className="w-full h-3 bg-gray-700/50 rounded-lg appearance-none cursor-pointer slider backdrop-blur-sm"
+                className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
                 style={customStyle}
                 {...props}
             />
-            <style suppressHydrationWarning>{`
+            {/* FIX: Removed the 'jsx' prop from the <style> tag. 
+                This syntax is specific to libraries like styled-jsx
+                and is not supported in a standard React setup, causing a type error. */}
+            <style>{`
                 .slider::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
-                    width: 20px;
-                    height: 20px;
+                    width: 16px;
+                    height: 16px;
                     background: var(--thumb-color);
                     border-radius: 50%;
                     cursor: pointer;
-                    border: 3px solid white;
-                    box-shadow: 0 0 15px var(--thumb-color), 0 0 30px var(--thumb-color)40;
-                    transition: all 0.2s ease;
-                }
-
-                .slider::-webkit-slider-thumb:hover {
-                    transform: scale(1.2);
-                    box-shadow: 0 0 20px var(--thumb-color), 0 0 40px var(--thumb-color)60;
+                    border: 2px solid white;
                 }
 
                 .slider::-moz-range-thumb {
-                    width: 20px;
-                    height: 20px;
+                    width: 16px;
+                    height: 16px;
                     background: var(--thumb-color);
                     border-radius: 50%;
                     cursor: pointer;
-                    border: 3px solid white;
-                    box-shadow: 0 0 15px var(--thumb-color);
-                    -moz-appearance: none;
-                }
-
-                .slider::-webkit-slider-track {
-                    background: rgba(75, 85, 99, 0.5);
-                    border-radius: 6px;
-                    height: 12px;
-                }
-                
-                .slider::-moz-range-track {
-                    background: rgba(75, 85, 99, 0.5);
-                    border-radius: 6px;
-                    height: 12px;
-                    border: none;
+                    border: 2px solid white;
                 }
             `}</style>
         </div>
