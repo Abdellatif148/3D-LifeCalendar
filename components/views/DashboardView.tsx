@@ -11,12 +11,19 @@ interface DashboardViewProps {
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({ onReset }) => {
-  const { lifeData, updateActivity } = useLifeData();
+  const { lifeData, baseActivities, updateActivity, resetActivities } =
+    useLifeData();
   const [deltas, setDeltas] = useState<Delta[]>([]);
+
+  useEffect(() => {
+    // Reset deltas and activities when baseActivities change (e.g. on initial load)
+    resetActivities();
+    setDeltas([]);
+  }, [baseActivities, resetActivities]);
 
   const handleSliderChange = (name: CategoryName, deltaMinutes: number) => {
     const baseValue =
-      lifeData.activities.find((a) => a.name === name)?.minutesPerDay ?? 0;
+      baseActivities.find((a) => a.name === name)?.minutesPerDay ?? 0;
     const newMinutes = baseValue + deltaMinutes;
     updateActivity(name, newMinutes);
 

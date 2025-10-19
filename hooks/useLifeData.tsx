@@ -35,9 +35,11 @@ const getInitialLifeData = (): LifeData => {
 
 interface LifeDataContextType {
   lifeData: LifeData;
+  baseActivities: ActivityData[];
   isInitialized: boolean;
   setLifeData: React.Dispatch<React.SetStateAction<LifeData>>;
   updateActivity: (_name: CategoryName, _minutes: number) => void;
+  resetActivities: () => void;
 }
 
 const LifeDataContext = createContext<LifeDataContextType | undefined>(
@@ -48,6 +50,9 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [lifeData, setLifeData] = useState<LifeData>(getInitialLifeData());
+  const [baseActivities, setBaseActivities] = useState<ActivityData[]>(
+    getInitialLifeData().activities
+  );
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -56,6 +61,10 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         setLifeData(parsedData);
+        // Also set base activities from storage if available, otherwise from initial.
+        setBaseActivities(
+          parsedData.activities || getInitialLifeData().activities
+        );
       }
     } catch (error) {
       console.error('Failed to parse lifeData from localStorage', error);
@@ -96,11 +105,17 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
+  const resetActivities = useCallback(() => {
+    setLifeData((prevData) => ({ ...prevData, activities: baseActivities }));
+  }, [baseActivities]);
+
   const value = {
     lifeData,
+    baseActivities,
     isInitialized,
     setLifeData,
     updateActivity,
+    resetActivities,
   };
 
   return (
