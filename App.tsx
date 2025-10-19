@@ -23,8 +23,10 @@ const AppContent: React.FC = () => {
             } else {
                 setView('onboarding');
             }
+        } else if (!user && !authLoading) {
+            setView('landing');
         }
-    }, [user, isInitialized, lifeData.currentAge]);
+    }, [user, isInitialized, lifeData.currentAge, authLoading]);
 
     const handleStart = () => {
         setView('onboarding');
@@ -68,7 +70,7 @@ const AppContent: React.FC = () => {
             default:
                 return <LandingView onStart={handleStart} />;
         }
-    }, [view, isInitialized, resetData]);
+    }, [view, isInitialized]);
 
     return (
         <div className="bg-gray-900 text-white min-h-screen">
