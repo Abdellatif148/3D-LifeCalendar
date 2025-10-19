@@ -5,25 +5,28 @@ import { TimeDataProvider } from './hooks/useTimeData';
 import LandingView from './components/views/LandingView';
 import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
+import SettingsView from './components/views/SettingsView';
 import AuthForm from './components/auth/AuthForm';
 import type { LifeData } from './types';
 
-type View = 'landing' | 'onboarding' | 'dashboard';
+type View = 'landing' | 'onboarding' | 'dashboard' | 'settings';
 
 const AppContent: React.FC = () => {
     const { user, loading: authLoading } = useAuth();
     const { lifeData, isInitialized, resetData } = useLifeData();
     const [view, setView] = useState<View>('landing');
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
-        if (isInitialized) {
+        if (isInitialized && isFirstLoad) {
             if (lifeData.currentAge > 0) {
                 setView('dashboard');
             } else {
-                setView('landing');
+                setView('onboarding');
             }
+            setIsFirstLoad(false);
         }
-    }, [isInitialized, lifeData.currentAge]);
+    }, [isInitialized, lifeData.currentAge, isFirstLoad]);
 
     const handleStart = () => {
         setView('onboarding');
@@ -36,6 +39,10 @@ const AppContent: React.FC = () => {
     const handleReset = () => {
         resetData();
         setView('onboarding');
+    };
+
+    const handleSettings = () => {
+        setView('settings');
     };
 
     if (authLoading) {
@@ -57,7 +64,9 @@ const AppContent: React.FC = () => {
             case 'onboarding':
                 return <OnboardingView onComplete={handleOnboardingComplete} />;
             case 'dashboard':
-                return <DashboardView onReset={handleReset} />;
+                return <DashboardView onReset={handleReset} onSettings={handleSettings} />;
+            case 'settings':
+                return <SettingsView onBack={() => setView('dashboard')} />;
             default:
                 return <LandingView onStart={handleStart} />;
         }

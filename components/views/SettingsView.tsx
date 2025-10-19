@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { useLifeData } from '../../hooks/useLifeData';
 import type { LifeData, ActivityData } from '../../types';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { MINUTES_IN_DAY, CATEGORY_MAP } from '../../constants';
 
-interface OnboardingViewProps {
-    onComplete: (data: LifeData) => void;
+interface SettingsViewProps {
+    onBack: () => void;
 }
 
-const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
-    const { markOnboardingComplete } = useAuth();
+const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
     const { lifeData, saveOnboardingData } = useLifeData();
     const [localData, setLocalData] = useState(lifeData);
-    
+
     const handleActivityChange = (name: string, hours: number) => {
         const minutes = hours * 60;
         const newActivities = localData.activities.map(act =>
@@ -27,30 +25,31 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
         const totalAllocated = activities
             .filter(a => a.name !== 'Unallocated')
             .reduce((sum, act) => sum + act.minutesPerDay, 0);
-        
+
         const unallocatedMinutes = Math.max(0, MINUTES_IN_DAY - totalAllocated);
-        
-        const finalActivities = activities.map(act => 
+
+        const finalActivities = activities.map(act =>
             act.name === 'Unallocated' ? {...act, minutesPerDay: unallocatedMinutes} : act
         );
         setLocalData(prev => ({ ...prev, activities: finalActivities }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         saveOnboardingData(localData);
-        await markOnboardingComplete();
-        onComplete(localData);
+        onBack();
     };
-    
+
     const unallocatedHours = (localData.activities.find(a => a.name === 'Unallocated')?.minutesPerDay ?? 0) / 60;
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-gray-900">
             <Card className="w-full max-w-2xl">
-                <h2 className="text-3xl font-bold text-center mb-2 text-white">Your Life, by the Numbers</h2>
-                <p className="text-center text-gray-400 mb-6">Let's set up your baseline. How do you spend a typical day?</p>
-                
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-3xl font-bold text-white">Settings</h2>
+                    <Button onClick={onBack} variant="secondary">Back</Button>
+                </div>
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -59,7 +58,7 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                                 type="number"
                                 value={localData.currentAge}
                                 onChange={e => setLocalData({ ...localData, currentAge: parseInt(e.target.value, 10) || 0 })}
-                                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                                 min="1"
                                 max="100"
@@ -71,7 +70,7 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                                 type="number"
                                 value={localData.targetAge}
                                 onChange={e => setLocalData({ ...localData, targetAge: parseInt(e.target.value, 10) || 0 })}
-                                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                                 min={localData.currentAge + 1}
                                 max="120"
@@ -107,7 +106,7 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
 
                     <div className="pt-4">
                         <Button type="submit" className="w-full text-lg">
-                            Visualize My Life
+                            Save Settings
                         </Button>
                     </div>
                 </form>
@@ -116,4 +115,4 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
     );
 };
 
-export default OnboardingView;
+export default SettingsView;
