@@ -1,181 +1,195 @@
+// FIX: Removed the triple-slash directive `/// <reference types="@react-three/fiber" />`.
+// This was causing a "Cannot find type definition file" error and preventing
+// TypeScript from correctly recognizing react-three-fiber's JSX elements.
+// The types should be picked up automatically from the imports.
 import React, { useRef, useMemo, useState } from 'react';
-import { Canvas, ThreeEvent } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { MAX_YEARS, WEEKS_IN_YEAR, CATEGORY_MAP } from '../../constants';
-import type { CategoryName } from '../../types';
+import { CATEGORY_MAP } from '../../constants';
+import type { CategoryName, Delta } from '../../types';
 
-interface WeekBlockProps {
-  position: [number, number, number];
-  color: string;
-  isPast: boolean;
-  onPointerOver: (_event: ThreeEvent<PointerEvent>) => void;
-  onPointerOut: (_event: ThreeEvent<PointerEvent>) => void;
-}
-
-const WeekBlock: React.FC<WeekBlockProps> = React.memo(
-  ({ position, color, isPast, onPointerOver, onPointerOut }) => {
-    const ref = useRef<THREE.Mesh>(null!);
-    return (
-      <mesh
-        position={position}
-        ref={ref}
-        onPointerOver={onPointerOver}
-        onPointerOut={onPointerOut}
-      >
-        <boxGeometry args={[0.9, 0.9, 0.2]} />
-        <meshStandardMaterial
-          color={color}
-          transparent
-          opacity={isPast ? 0.15 : 0.9}
-          roughness={0.6}
-          metalness={0.1}
-        />
-      </mesh>
-    );
-  }
-);
-
-interface LifeGridProps {
-  currentAge: number;
-  targetAge: number;
-  dominantColorActivity: CategoryName;
-}
-
-const LifeGrid: React.FC<LifeGridProps> = ({
-  currentAge,
-  targetAge,
-  dominantColorActivity,
-}) => {
-  const groupRef = useRef<THREE.Group>(null!);
-  const [hovered, setHovered] = useState<{
-    year: number;
-    week: number;
+interface YearBlockProps {
     position: [number, number, number];
     color: string;
     isPast: boolean;
-  } | null>(null);
+    isImpacted: boolean;
+    onPointerOver: (event: any) => void;
+    onPointerOut: (event: any) => void;
+    onClick: () => void;
+}
 
-  const weeks = useMemo(() => {
-    const grid = [];
-    const pastColor = '#4B5563'; // Dim gray
-    const futureColor = CATEGORY_MAP[dominantColorActivity].color;
-    const targetColor = '#10B981'; // Bright green for target year
+const YearBlock: React.FC<YearBlockProps> = React.memo(({ position, color, isPast, isImpacted, onPointerOver, onPointerOut, onClick }) => {
+    const ref = useRef<THREE.Mesh>(null!);
+    return (
+        <mesh position={position} ref={ref} onPointerOver={onPointerOver} onPointerOut={onPointerOut} onClick={onClick}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial 
+                color={color} 
+                transparent 
+                opacity={isPast ? 0.25 : 0.8} 
+                roughness={0.5}
+                metalness={0.2}
+                emissive={isImpacted ? color : '#000000'}
+                emissiveIntensity={isImpacted ? 0.5 : 0}
+            />
+        </mesh>
+    );
+});
 
-    for (let year = 0; year < MAX_YEARS; year++) {
-      for (let week = 0; week < WEEKS_IN_YEAR; week++) {
-        const isPast = year < currentAge;
-        const isTargetYear = year === targetAge;
+interface LifeGridProps {
+    currentAge: number;
+    targetAge: number;
+    dominantColorActivity: CategoryName;
+    onYearClick: (year: number) => void;
+    deltas: Delta[];
+}
 
-        let color = isPast ? pastColor : futureColor;
-        if (isTargetYear) {
-          color = targetColor;
-        }
+const LifeGrid: React.FC<LifeGridProps> = ({ currentAge, targetAge, dominantColorActivity, onYearClick, deltas }) => {
+    const groupRef = useRef<THREE.Group>(null!);
+    const [hovered, setHovered] = useState<{ year: number; position: [number, number, number]; color: string; isPast: boolean; title?: string } | null>(null);
 
-        grid.push({
-          key: `week-${year}-${week}`,
-          position: [
-            (week - WEEKS_IN_YEAR / 2) * 1.05,
-            (year - MAX_YEARS / 2) * 1.05,
-            0,
-          ] as [number, number, number],
-          color: color,
-          isPast,
-          year,
-          week,
-        });
-      }
-    }
-    return grid;
-  }, [currentAge, dominantColorActivity, targetAge]);
+    const { years, gridDimensions } = useMemo(() => {
+        const grid = [];
+        const pastColor = "#4B5563"; // Dim gray
+        const currentColor = "#34D399"; // Green
+        const futureColor = CATEGORY_MAP[dominantColorActivity].color;
+        
+        const totalDeltaMinutes = deltas.reduce((sum, delta) => sum + delta.deltaMinutes, 0);
 
-  return (
-    <group ref={groupRef} rotation={[0.2, 0, 0]}>
-      {weeks.map((w) => (
-        <WeekBlock
-          key={w.key}
-          position={w.position}
-          color={w.color}
-          isPast={w.isPast}
-          onPointerOver={(e) => {
-            e.stopPropagation();
-            setHovered({
-              year: w.year,
-              week: w.week + 1,
-              position: w.position,
-              color: w.color,
-              isPast: w.isPast,
+        const cols = Math.ceil(Math.sqrt(targetAge));
+        const rows = Math.ceil(targetAge / cols);
+        const spacing = 1.2;
+
+        for (let year = 0; year < targetAge; year++) {
+            const isCurrent = year === currentAge -1;
+            const isPast = year < currentAge;
+            
+            const color = isCurrent ? currentColor : (isPast ? pastColor : futureColor);
+            const isImpacted = !isPast && totalDeltaMinutes > 0;
+
+            const row = Math.floor(year / cols);
+            const col = year % cols;
+            
+            grid.push({
+                key: `year-${year}`,
+                position: [
+                    (col - (cols - 1) / 2) * spacing,
+                    ((rows - 1) / 2 - row) * spacing, 
+                    0
+                ] as [number, number, number],
+                color: color,
+                isPast,
+                isImpacted,
+                year,
             });
-          }}
-          onPointerOut={() => {
-            setHovered(null);
-          }}
-        />
-      ))}
-      {hovered && (
-        <Text
-          position={[hovered.position[0], hovered.position[1] + 1.2, 0.5]}
-          fontSize={1.5}
-          color={hovered.isPast ? '#A0A0A0' : hovered.color}
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.03}
-          outlineColor="#000000"
-        >
-          {`Year ${hovered.year + 1}, Week ${hovered.week}`}
-        </Text>
-      )}
-      <Text
-        position={[
-          (-WEEKS_IN_YEAR / 2) * 1.05 - 5,
-          (targetAge - MAX_YEARS / 2) * 1.05,
-          0,
-        ]}
-        rotation={[0, 0, 0]}
-        fontSize={2}
-        color="#10B981"
-        anchorX="right"
-        anchorY="middle"
-      >
-        {`Target: ${targetAge}`}
-      </Text>
-      <Text
-        position={[
-          (-WEEKS_IN_YEAR / 2) * 1.05 - 5,
-          (currentAge - MAX_YEARS / 2) * 1.05,
-          0,
-        ]}
-        rotation={[0, 0, 0]}
-        fontSize={2}
-        color="#FBBF24"
-        anchorX="right"
-        anchorY="middle"
-      >
-        {`Now: ${currentAge}`}
-      </Text>
-    </group>
-  );
+        }
+        return { years: grid, gridDimensions: { cols, rows, spacing }};
+    }, [currentAge, dominantColorActivity, targetAge, deltas]);
+
+    const nowLabelPosition = useMemo(() => {
+        if (currentAge >= targetAge || currentAge < 1) return null;
+        const { cols, rows, spacing } = gridDimensions;
+        const row = Math.floor((currentAge - 1) / cols);
+        const x = -(cols / 2) * spacing - 1;
+        const y = ((rows - 1) / 2 - row) * spacing;
+        return [x, y, 0] as [number, number, number];
+    }, [currentAge, targetAge, gridDimensions]);
+
+    return (
+        <group ref={groupRef}>
+            {years.map(y => 
+                <YearBlock 
+                    key={y.key} 
+                    position={y.position}
+                    color={y.color}
+                    isPast={y.isPast}
+                    isImpacted={y.isImpacted}
+                    onPointerOver={(e) => {
+                        e.stopPropagation();
+                        let title = '';
+                        try {
+                           const savedData = localStorage.getItem(`data-year-${y.year}`);
+                           if (savedData) {
+                               title = JSON.parse(savedData).title || '';
+                           }
+                        } catch (error) {
+                            console.error("Failed to parse year data for tooltip", error)
+                        }
+                        setHovered({ year: y.year, position: y.position, color: y.color, isPast: y.isPast, title });
+                    }}
+                    onPointerOut={() => {
+                        setHovered(null);
+                    }}
+                    onClick={() => onYearClick(y.year)}
+                />
+            )}
+             {hovered && (
+                <group position={[hovered.position[0], hovered.position[1], 1.5]}>
+                    <mesh>
+                         <planeGeometry args={[7, hovered.title ? 2.5 : 1.5]} />
+                        <meshBasicMaterial color="#111827" transparent opacity={0.85} />
+                    </mesh>
+                    <Text
+                        position={[0, hovered.title ? 0.5 : 0, 0.1]}
+                        fontSize={0.6}
+                        color={hovered.year === currentAge - 1 ? '#34D399' : (hovered.isPast ? '#A0A0A0' : hovered.color)}
+                        anchorX="center"
+                        anchorY="middle"
+                        maxWidth={6.5}
+                        textAlign="center"
+                    >
+                        {hovered.title || `Year ${hovered.year + 1}`}
+                    </Text>
+                     {hovered.title && (
+                         <Text
+                            position={[0, -0.5, 0.1]}
+                            fontSize={0.4}
+                            color="#9CA3AF"
+                            anchorX="center"
+                            anchorY="middle"
+                        >
+                            {`Year ${hovered.year + 1}`}
+                        </Text>
+                     )}
+                </group>
+            )}
+
+            {nowLabelPosition && (
+                 <Text
+                    position={nowLabelPosition}
+                    rotation={[0,0,0]}
+                    fontSize={1}
+                    color="#34D399"
+                    anchorX="right"
+                    anchorY="middle"
+                >
+                    {`Now: ${currentAge}`}
+                </Text>
+            )}
+        </group>
+    );
 };
 
 const LifeGrid3D: React.FC<LifeGridProps> = (props) => {
-  return (
-    <Canvas
-      camera={{ position: [0, 0, 80], fov: 50 }}
-      style={{ background: 'transparent' }}
-    >
-      <ambientLight intensity={0.8} />
-      <pointLight position={[0, 20, 50]} intensity={1.5} />
-      <pointLight position={[0, -20, -50]} intensity={0.5} color="#8B5CF6" />
-      <LifeGrid {...props} />
-      <OrbitControls
-        enableZoom={true}
-        enablePan={true}
-        minDistance={20}
-        maxDistance={150}
-        zoomSpeed={0.8}
-      />
-    </Canvas>
-  );
+    return (
+        <Canvas 
+            camera={{ position: [0, 0, 25], fov: 50 }}
+            style={{ background: 'transparent' }}
+        >
+            <ambientLight intensity={0.8} />
+            <pointLight position={[0, 10, 20]} intensity={1.5} />
+            <pointLight position={[0, -10, -20]} intensity={0.5} color="#8B5CF6" />
+            <LifeGrid {...props} />
+            <OrbitControls 
+                enableZoom={true} 
+                enablePan={true}
+                minDistance={10}
+                maxDistance={60}
+                zoomSpeed={0.8}
+            />
+        </Canvas>
+    );
 };
 
 export default LifeGrid3D;
