@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
 import type { TimeDataState, YearData, DayData, DailyTask } from '../types';
 
 interface TimeDataContextType {
@@ -17,26 +18,75 @@ export const TimeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        try {
-            const storedData = localStorage.getItem('timeData');
-            if (storedData) {
-                setTimeData(JSON.parse(storedData));
+        const loadTimeData = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    const { data, error } = await supabase
+                        .from('time_data')
+                        .select('*')
+                        .eq('user_id', user.id);
+
+                    if (error) {
+                        console.error('Error loading time data:', error);
+                    } else if (data && data.length > 0) {
+                        const reconstructed: TimeDataState = {};
+                        data.forEach(row => {
+                            reconstructed[row.year] = row.data as YearData;
+                        });
+                        setTimeData(reconstructed);
+                    }
+                } else {
+                    const storedData = localStorage.getItem('timeData');
+                    if (storedData) {
+                        setTimeData(JSON.parse(storedData));
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load time data:', error);
+            } finally {
+                setIsInitialized(true);
             }
-        } catch (error) {
-            console.error("Failed to load timeData from localStorage", error);
-        } finally {
-            setIsInitialized(true);
-        }
+        };
+
+        loadTimeData();
     }, []);
 
     useEffect(() => {
-        if (isInitialized) {
+        const saveTimeData = async () => {
+            if (!isInitialized) return;
+
             try {
-                localStorage.setItem('timeData', JSON.stringify(timeData));
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    const years = Object.keys(timeData).map(Number);
+
+                    for (const year of years) {
+                        const { error } = await supabase
+                            .from('time_data')
+                            .upsert({
+                                user_id: user.id,
+                                year,
+                                data: timeData[year],
+                            }, {
+                                onConflict: 'user_id,year'
+                            });
+
+                        if (error) {
+                            console.error(`Error saving time data for year ${year}:`, error);
+                        }
+                    }
+                } else {
+                    localStorage.setItem('timeData', JSON.stringify(timeData));
+                }
             } catch (error) {
-                console.error("Failed to save timeData to localStorage", error);
+                console.error('Failed to save time data:', error);
             }
-        }
+        };
+
+        saveTimeData();
     }, [timeData, isInitialized]);
     
     const getYearData = useCallback((year: number): YearData => {

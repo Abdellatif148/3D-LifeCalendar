@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LifeDataProvider, useLifeData } from './hooks/useLifeData';
 import { TimeDataProvider } from './hooks/useTimeData';
 import LandingView from './components/views/LandingView';
 import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
+import AuthForm from './components/auth/AuthForm';
 import type { LifeData } from './types';
 
 type View = 'landing' | 'onboarding' | 'dashboard';
 
 const AppContent: React.FC = () => {
-    // FIX: Get resetData function from the hook to implement a full reset.
+    const { user, loading: authLoading } = useAuth();
     const { lifeData, isInitialized, resetData } = useLifeData();
     const [view, setView] = useState<View>('landing');
 
@@ -32,10 +34,17 @@ const AppContent: React.FC = () => {
     };
 
     const handleReset = () => {
-        // FIX: Call the resetData function from the context to clear all user data.
         resetData();
         setView('onboarding');
     };
+
+    if (authLoading) {
+        return <div className="flex items-center justify-center h-screen bg-gray-900 text-white">Loading...</div>;
+    }
+
+    if (!user) {
+        return <AuthForm />;
+    }
 
     const currentView = useMemo(() => {
         if (!isInitialized) {
@@ -46,13 +55,13 @@ const AppContent: React.FC = () => {
             case 'landing':
                 return <LandingView onStart={handleStart} />;
             case 'onboarding':
-return <OnboardingView onComplete={handleOnboardingComplete} />;
+                return <OnboardingView onComplete={handleOnboardingComplete} />;
             case 'dashboard':
                 return <DashboardView onReset={handleReset} />;
             default:
                 return <LandingView onStart={handleStart} />;
         }
-    }, [view, isInitialized, resetData]); // Added resetData to dependency array
+    }, [view, isInitialized, resetData]);
 
     return (
         <div className="bg-gray-900 text-white min-h-screen">
@@ -63,11 +72,13 @@ return <OnboardingView onComplete={handleOnboardingComplete} />;
 
 const App: React.FC = () => {
     return (
-        <LifeDataProvider>
-            <TimeDataProvider> {/* Wrap with the new provider */}
-                <AppContent />
-            </TimeDataProvider>
-        </LifeDataProvider>
+        <AuthProvider>
+            <LifeDataProvider>
+                <TimeDataProvider>
+                    <AppContent />
+                </TimeDataProvider>
+            </LifeDataProvider>
+        </AuthProvider>
     );
 };
 

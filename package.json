@@ -14,7 +14,8 @@
     "three": "^0.179.1",
     "@react-three/fiber": "^9.3.0",
     "@react-three/drei": "^10.7.4",
-    "@google/genai": "^1.25.0"
+    "@google/genai": "^1.25.0",
+    "@supabase/supabase-js": "^2.47.12"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

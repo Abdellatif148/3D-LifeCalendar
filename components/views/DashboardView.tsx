@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { useLifeData } from '../../hooks/useLifeData';
 import { useTimeData } from '../../hooks/useTimeData';
-// FIX: Import DayData and YearData to be used for type assertions.
 import type { CategoryName, Delta, AppNotification, DailyTask, DayData, YearData } from '../../types';
 import { MINUTES_IN_DAY } from '../../constants';
 import ControlPanel from '../dashboard/ControlPanel';
@@ -70,6 +70,7 @@ const useReminderScheduler = (onShowNotification: (title: string, message: strin
 
 
 const DashboardView: React.FC<DashboardViewProps> = ({ onReset }) => {
+    const { signOut } = useAuth();
     const { lifeData } = useLifeData();
     const [deltas, setDeltas] = useState<Delta[]>([]);
     const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -85,6 +86,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({ onReset }) => {
 
     const closeNotification = (id: number) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
+    };
+
+    const handleLogout = async () => {
+        await signOut();
     };
 
     const formatTime = (minutes: number) => {
@@ -165,13 +170,14 @@ const DashboardView: React.FC<DashboardViewProps> = ({ onReset }) => {
         <>
             <div style={{ display: mainDashboardVisible ? 'flex' : 'none' }} className="flex-col h-screen bg-gray-900 overflow-hidden">
                 <header className="flex-shrink-0 bg-gray-900/80 backdrop-blur-sm z-20 p-3 flex justify-between items-center border-b border-gray-700">
-                    <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">3D Time Optimizer</h1>
+                    <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">3D Time Optimizer</h1>
                     <div className="flex items-center gap-4">
                         <GlobalSearch onNavigate={handleSearchNavigate} targetAge={lifeData.targetAge} currentAge={lifeData.currentAge} />
                         <Button onClick={() => handleNav('guide')} variant="secondary" className="px-4 py-2 text-sm">Guide</Button>
                         <Button onClick={() => handleNav('calendar')} variant="secondary" className="px-4 py-2 text-sm">Calendar</Button>
                         <Button onClick={() => handleNav('notes')} variant="secondary" className="px-4 py-2 text-sm">Notes</Button>
                         <Button onClick={onReset} variant="secondary" className="px-4 py-2 text-sm">Reset</Button>
+                        <Button onClick={handleLogout} variant="secondary" className="px-4 py-2 text-sm">Logout</Button>
                     </div>
                 </header>
                 <div className="flex-grow flex flex-col md:flex-row overflow-hidden">

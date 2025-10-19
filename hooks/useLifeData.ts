@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
 import type { LifeData, ActivityData, CategoryName } from '../types';
 import { MINUTES_IN_DAY } from '../constants';
 
@@ -13,7 +14,7 @@ const defaultActivities: ActivityData[] = [
 const getInitialLifeData = (): LifeData => {
     const totalAllocated = defaultActivities.reduce((sum, act) => sum + act.minutesPerDay, 0);
     const unallocated = MINUTES_IN_DAY - totalAllocated;
-    
+
     return {
         currentAge: 0,
         targetAge: 80,
@@ -39,27 +40,74 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        try {
-            const storedData = localStorage.getItem('lifeData');
-            if (storedData) {
-                const parsedData = JSON.parse(storedData);
-                setLifeData(parsedData);
+        const loadLifeData = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    const { data, error } = await supabase
+                        .from('life_data')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .maybeSingle();
+
+                    if (error) {
+                        console.error('Error loading life data:', error);
+                    } else if (data) {
+                        setLifeData({
+                            currentAge: data.current_age,
+                            targetAge: data.target_age,
+                            activities: data.activities as ActivityData[],
+                        });
+                    }
+                } else {
+                    const storedData = localStorage.getItem('lifeData');
+                    if (storedData) {
+                        const parsedData = JSON.parse(storedData);
+                        setLifeData(parsedData);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load life data:', error);
+            } finally {
+                setIsInitialized(true);
             }
-        } catch (error) {
-            console.error("Failed to parse lifeData from localStorage", error);
-        } finally {
-            setIsInitialized(true);
-        }
+        };
+
+        loadLifeData();
     }, []);
 
     useEffect(() => {
-        if(isInitialized) {
+        const saveLifeData = async () => {
+            if (!isInitialized) return;
+
             try {
-                localStorage.setItem('lifeData', JSON.stringify(lifeData));
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    const { error } = await supabase
+                        .from('life_data')
+                        .upsert({
+                            user_id: user.id,
+                            current_age: lifeData.currentAge,
+                            target_age: lifeData.targetAge,
+                            activities: lifeData.activities,
+                        }, {
+                            onConflict: 'user_id'
+                        });
+
+                    if (error) {
+                        console.error('Error saving life data:', error);
+                    }
+                } else {
+                    localStorage.setItem('lifeData', JSON.stringify(lifeData));
+                }
             } catch (error) {
-                console.error("Failed to save lifeData to localStorage", error);
+                console.error('Failed to save life data:', error);
             }
-        }
+        };
+
+        saveLifeData();
     }, [lifeData, isInitialized]);
 
     const updateActivity = useCallback((name: CategoryName, minutes: number) => {
@@ -86,11 +134,24 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setLifeData(data);
     }, []);
 
-    const resetData = useCallback(() => {
+    const resetData = useCallback(async () => {
         try {
-            localStorage.removeItem('lifeData');
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                const { error } = await supabase
+                    .from('life_data')
+                    .delete()
+                    .eq('user_id', user.id);
+
+                if (error) {
+                    console.error('Error deleting life data:', error);
+                }
+            } else {
+                localStorage.removeItem('lifeData');
+            }
         } catch (error) {
-            console.error("Failed to remove lifeData from localStorage", error);
+            console.error('Failed to reset life data:', error);
         }
         setLifeData(getInitialLifeData());
     }, []);
