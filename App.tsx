@@ -45,14 +45,6 @@ const AppContent: React.FC = () => {
         setView('settings');
     };
 
-    if (authLoading) {
-        return <div className="flex items-center justify-center h-screen bg-gray-900 text-white">Loading...</div>;
-    }
-
-    if (!user) {
-        return <AuthForm />;
-    }
-
     const currentView = useMemo(() => {
         if (!isInitialized) {
             return <div className="flex items-center justify-center h-screen bg-gray-900 text-white">Loading...</div>;
@@ -71,6 +63,14 @@ const AppContent: React.FC = () => {
                 return <LandingView onStart={handleStart} />;
         }
     }, [view, isInitialized]);
+
+    if (authLoading) {
+        return <div className="flex items-center justify-center h-screen bg-gray-900 text-white">Loading...</div>;
+    }
+
+    if (!user) {
+        return <AuthForm />;
+    }
 
     return (
         <div className="bg-gray-900 text-white min-h-screen">
