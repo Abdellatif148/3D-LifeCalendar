@@ -15,18 +15,16 @@ const AppContent: React.FC = () => {
     const { user, loading: authLoading } = useAuth();
     const { lifeData, isInitialized, resetData } = useLifeData();
     const [view, setView] = useState<View>('landing');
-    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
-        if (isInitialized && isFirstLoad) {
+        if (user && isInitialized) {
             if (lifeData.currentAge > 0) {
                 setView('dashboard');
             } else {
                 setView('onboarding');
             }
-            setIsFirstLoad(false);
         }
-    }, [isInitialized, lifeData.currentAge, isFirstLoad]);
+    }, [user, isInitialized, lifeData.currentAge]);
 
     const handleStart = () => {
         setView('onboarding');
