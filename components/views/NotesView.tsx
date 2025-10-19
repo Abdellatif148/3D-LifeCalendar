@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../../lib/supabase';
 import Button from '../ui/Button';
 
 interface NotesViewProps {
     onBack: () => void;
 }
 
-// Debounce hook
 const useDebounce = (value: string, delay: number) => {
     const [debouncedValue, setDebouncedValue] = useState(value);
     useEffect(() => {
@@ -19,35 +19,88 @@ const useDebounce = (value: string, delay: number) => {
     return debouncedValue;
 };
 
-
 const NotesView: React.FC<NotesViewProps> = ({ onBack }) => {
     const [notes, setNotes] = useState('');
-    const [status, setStatus] = useState('Ready');
-    const debouncedNotes = useDebounce(notes, 500); // 500ms delay
+    const [status, setStatus] = useState('Loading...');
+    const [isInitialized, setIsInitialized] = useState(false);
+    const debouncedNotes = useDebounce(notes, 500);
 
     useEffect(() => {
-        try {
-            const savedNotes = localStorage.getItem('app-notes');
-            if (savedNotes) {
-                setNotes(savedNotes);
+        const loadNotes = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    const { data, error } = await supabase
+                        .from('notes')
+                        .select('content')
+                        .eq('user_id', user.id)
+                        .maybeSingle();
+
+                    if (error) {
+                        console.error('Error loading notes:', error);
+                        setStatus('Error loading');
+                    } else if (data) {
+                        setNotes(data.content);
+                        setStatus('Ready');
+                    } else {
+                        setStatus('Ready');
+                    }
+                } else {
+                    const savedNotes = localStorage.getItem('app-notes');
+                    if (savedNotes) {
+                        setNotes(savedNotes);
+                    }
+                    setStatus('Ready');
+                }
+            } catch (error) {
+                console.error('Failed to load notes:', error);
+                setStatus('Error loading');
+            } finally {
+                setIsInitialized(true);
             }
-        } catch (e) {
-            console.error("Failed to load notes from localStorage", e);
-        }
+        };
+
+        loadNotes();
     }, []);
 
     useEffect(() => {
-        if (debouncedNotes !== undefined) {
+        if (!isInitialized) return;
+
+        const saveNotes = async () => {
             try {
-                localStorage.setItem('app-notes', debouncedNotes);
-                setStatus('Saved');
-                setTimeout(() => setStatus('Ready'), 2000);
-            } catch (e) {
-                console.error("Failed to save notes to localStorage", e);
-                setStatus('Error');
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    const { error } = await supabase
+                        .from('notes')
+                        .upsert({
+                            user_id: user.id,
+                            content: debouncedNotes,
+                        }, {
+                            onConflict: 'user_id'
+                        });
+
+                    if (error) {
+                        console.error('Error saving notes:', error);
+                        setStatus('Error saving');
+                    } else {
+                        setStatus('Saved');
+                        setTimeout(() => setStatus('Ready'), 2000);
+                    }
+                } else {
+                    localStorage.setItem('app-notes', debouncedNotes);
+                    setStatus('Saved');
+                    setTimeout(() => setStatus('Ready'), 2000);
+                }
+            } catch (error) {
+                console.error('Failed to save notes:', error);
+                setStatus('Error saving');
             }
-        }
-    }, [debouncedNotes]);
+        };
+
+        saveNotes();
+    }, [debouncedNotes, isInitialized]);
 
     const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNotes(e.target.value);
