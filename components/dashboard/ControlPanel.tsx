@@ -28,13 +28,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activities, onSliderChange,
 
     const { annualHoursGained, lifetimeDaysGained, totalDeltaMinutes } = useMemo(() => {
         const totalDeltaMinutes = deltas.reduce((sum, delta) => sum + delta.deltaMinutes, 0);
-        const annualHoursGained = (totalDeltaMinutes * 365) / 60;
-        const lifetimeDaysGained = (annualHoursGained * yearsLeft) / 24;
+        const annualHoursGained = Math.abs((totalDeltaMinutes * 365) / 60);
+        const lifetimeDaysGained = Math.abs((annualHoursGained * yearsLeft) / 24);
         return { totalDeltaMinutes, annualHoursGained, lifetimeDaysGained };
     }, [deltas, yearsLeft]);
 
-    const gainOrLossText = totalDeltaMinutes >= 0 ? 'Gained' : 'Reallocated';
-    const gainOrLossColor = totalDeltaMinutes >= 0 ? 'text-green-400' : 'text-yellow-400';
+    const gainOrLossText = totalDeltaMinutes >= 0 ? 'Gained' : 'Lost';
+    const gainOrLossColor = totalDeltaMinutes >= 0 ? 'text-green-400' : 'text-red-400';
 
     const handleAddGoal = (e: React.FormEvent) => {
         e.preventDefault();

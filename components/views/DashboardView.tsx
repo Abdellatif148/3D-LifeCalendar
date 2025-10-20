@@ -8,6 +8,7 @@ import ControlPanel from '../dashboard/ControlPanel';
 import LifeGrid3D from '../dashboard/LifeGrid3D';
 import YearView from './YearView';
 import { GlobalSearch } from '../dashboard/GlobalSearch';
+import MetricsPanel from '../dashboard/MetricsPanel';
 import Button from '../ui/Button';
 import GuideView from './GuideView';
 import CalendarView from './CalendarView';
@@ -194,6 +195,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ onReset, onSettings }) =>
                     <aside className="w-full md:w-96 bg-gray-800/50 backdrop-blur-sm border-l border-gray-700/50 p-4 overflow-y-auto order-1 md:order-2">
                         <div className="space-y-6">
                             <ControlPanel activities={modifiedActivities} onSliderChange={handleSliderChange} deltas={deltas} yearsLeft={yearsLeft} />
+                            <MetricsPanel lifeData={lifeData} deltas={deltas} />
                         </div>
                     </aside>
                 </div>

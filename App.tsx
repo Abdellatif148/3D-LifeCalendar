@@ -7,6 +7,8 @@ import OnboardingView from './components/views/OnboardingView';
 import DashboardView from './components/views/DashboardView';
 import SettingsView from './components/views/SettingsView';
 import AuthForm from './components/auth/AuthForm';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import LoadingSpinner from './components/ui/LoadingSpinner';
 import type { LifeData } from './types';
 
 type View = 'landing' | 'onboarding' | 'dashboard' | 'settings';
@@ -65,7 +67,14 @@ const AppContent: React.FC = () => {
     }, [view, isInitialized]);
 
     if (authLoading) {
-        return <div className="flex items-center justify-center h-screen bg-gray-900 text-white">Loading...</div>;
+        return (
+            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
+                <div className="text-center">
+                    <LoadingSpinner size="lg" className="mx-auto mb-4" />
+                    <p>Loading...</p>
+                </div>
+            </div>
+        );
     }
 
     if (!user) {
@@ -81,13 +90,15 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <AuthProvider>
-            <LifeDataProvider>
-                <TimeDataProvider>
-                    <AppContent />
-                </TimeDataProvider>
-            </LifeDataProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+            <AuthProvider>
+                <LifeDataProvider>
+                    <TimeDataProvider>
+                        <AppContent />
+                    </TimeDataProvider>
+                </LifeDataProvider>
+            </AuthProvider>
+        </ErrorBoundary>
     );
 };
 

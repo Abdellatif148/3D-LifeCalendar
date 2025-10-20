@@ -60,6 +60,14 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate, targetAg
         const recencyScore = 100 / (1 + yearDifference * yearDifference);
         score += recencyScore;
 
+        // Date-based search bonus
+        const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
+                           'july', 'august', 'september', 'october', 'november', 'december'];
+        const monthIndex = monthNames.findIndex(month => lowerQuery.includes(month));
+        if (monthIndex !== -1 && item.month === monthIndex) {
+            score += 50;
+        }
+
         return score;
     }, [currentAge]);
 
@@ -128,7 +136,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate, targetAg
                                 searchResults.push({ type: 'day', year, month, week, day, date, dayOfMonth, text: dayData.title, context: `Focus for ${date.toLocaleDateString()}`, relevance: 0 });
                             }
                             (dayData.goals || []).forEach(goal => {
-                                let fullText = `${goal.text} ${goal.description || ''} ${goal.location || ''} ${goal.link || ''}`.toLowerCase();
+                                let fullText = `${goal.text} ${goal.description || ''} ${goal.location || ''} ${goal.link || ''} ${goal.guests || ''}`.toLowerCase();
                                 if (fullText.includes(lowerQuery)) {
                                     searchResults.push({ type: 'goal', year, month, week, day, date, dayOfMonth, text: goal.text, context: `On ${date.toLocaleDateString()}`, relevance: 0 });
                                 }

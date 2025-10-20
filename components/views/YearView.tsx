@@ -175,6 +175,13 @@ const DayDetailView: React.FC<DayDetailViewProps> = ({ day, dayData, onUpdate, o
         setEditingText('');
     };
 
+    const handleStartEdit = (index: number, task: DailyTask) => {
+        if (!task.completed) {
+            setEditingIndex(index);
+            setEditingText(task.text);
+        }
+    };
+
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDayData = { ...localDayData, title: e.target.value };
         setLocalDayData(newDayData);
@@ -200,7 +207,7 @@ const DayDetailView: React.FC<DayDetailViewProps> = ({ day, dayData, onUpdate, o
             <div className="flex-grow space-y-2 overflow-y-auto">
                  <h3 className="text-sm font-bold text-gray-400">Tasks</h3>
                 {localDayData.goals.map((task, index) => (
-                    <div key={index} className="flex items-center bg-gray-700 p-2 rounded-md transition-all duration-200">
+                    <div key={index} className={`group flex items-center p-3 rounded-md transition-all duration-200 hover:bg-gray-600/50 ${task.completed ? 'bg-gray-700/30' : 'bg-gray-700'}`}>
                         <input type="checkbox" checked={task.completed} onChange={() => handleToggleTask(index)} className="h-5 w-5 rounded bg-gray-600 border-gray-500 text-purple-500 focus:ring-purple-600 flex-shrink-0"/>
                         {editingIndex === index ? (
                             <input
@@ -214,16 +221,19 @@ const DayDetailView: React.FC<DayDetailViewProps> = ({ day, dayData, onUpdate, o
                             />
                         ) : (
                             <span 
-                                className={`ml-3 flex-grow cursor-pointer transition-colors ${task.completed ? 'line-through text-gray-500' : 'text-gray-200'}`}
-                                onClick={() => {
-                                    setEditingIndex(index);
-                                    setEditingText(task.text);
-                                }}
+                                className={`ml-3 flex-grow transition-colors ${task.completed ? 'line-through text-gray-500' : 'text-gray-200 cursor-pointer hover:text-white'}`}
+                                onClick={() => handleStartEdit(index, task)}
                             >
                                 {task.text}
                             </span>
                         )}
-                        <button onClick={() => handleDeleteTask(index)} className="text-gray-500 hover:text-red-500 text-xs ml-2 flex-shrink-0">Delete</button>
+                        <button 
+                            onClick={() => handleDeleteTask(index)} 
+                            className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 text-lg ml-2 flex-shrink-0 transition-all duration-200 w-6 h-6 flex items-center justify-center"
+                            title="Delete task"
+                        >
+                            ×
+                        </button>
                     </div>
                 ))}
                 {localDayData.goals.length === 0 && <p className="text-gray-500 text-center py-4">No tasks for this day.</p>}

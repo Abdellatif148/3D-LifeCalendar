@@ -1,7 +1,3 @@
-// FIX: Removed the triple-slash directive `/// <reference types="@react-three/fiber" />`.
-// This was causing a "Cannot find type definition file" error and preventing
-// TypeScript from correctly recognizing react-three-fiber's JSX elements.
-// The types should be picked up automatically from the imports.
 import React, { useRef, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
@@ -37,6 +33,8 @@ const YearBlock: React.FC<YearBlockProps> = React.memo(({ position, color, isPas
     );
 });
 
+YearBlock.displayName = 'YearBlock';
+
 interface LifeGridProps {
     currentAge: number;
     targetAge: number;
@@ -66,7 +64,7 @@ const LifeGrid: React.FC<LifeGridProps> = ({ currentAge, targetAge, dominantColo
             const isPast = year < currentAge;
             
             const color = isCurrent ? currentColor : (isPast ? pastColor : futureColor);
-            const isImpacted = !isPast && totalDeltaMinutes > 0;
+            const isImpacted = !isPast && Math.abs(totalDeltaMinutes) > 0;
 
             const row = Math.floor(year / cols);
             const col = year % cols;
@@ -109,10 +107,8 @@ const LifeGrid: React.FC<LifeGridProps> = ({ currentAge, targetAge, dominantColo
                         e.stopPropagation();
                         let title = '';
                         try {
-                           const savedData = localStorage.getItem(`data-year-${y.year}`);
-                           if (savedData) {
-                               title = JSON.parse(savedData).title || '';
-                           }
+                            // This should be handled by the TimeData context
+                            title = `Year ${y.year + 1}`;
                         } catch (error) {
                             console.error("Failed to parse year data for tooltip", error)
                         }
@@ -176,6 +172,8 @@ const LifeGrid3D: React.FC<LifeGridProps> = (props) => {
         <Canvas 
             camera={{ position: [0, 0, 25], fov: 50 }}
             style={{ background: 'transparent' }}
+            gl={{ antialias: true, alpha: true }}
+            dpr={[1, 2]}
         >
             <ambientLight intensity={0.8} />
             <pointLight position={[0, 10, 20]} intensity={1.5} />
@@ -187,6 +185,8 @@ const LifeGrid3D: React.FC<LifeGridProps> = (props) => {
                 minDistance={10}
                 maxDistance={60}
                 zoomSpeed={0.8}
+                enableDamping={true}
+                dampingFactor={0.05}
             />
         </Canvas>
     );

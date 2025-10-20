@@ -98,9 +98,9 @@ const CalendarView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             <div className="bg-purple-600 text-white font-bold rounded px-1 py-0.5 truncate">{dayData.title}</div>
                         )}
                         {dayData && filteredTasks(dayData.goals).map((task, idx) => (
-                             <li key={idx} className={`list-none truncate ${task.completed ? 'text-gray-500 line-through' : (task.type === 'event' ? 'text-yellow-400' : 'text-cyan-300')}`}>
+                             <div key={idx} className={`text-xs truncate ${task.completed ? 'text-gray-500 line-through' : (task.type === 'event' ? 'text-yellow-400' : 'text-cyan-300')}`}>
                                 {task.text}
-                             </li>
+                             </div>
                         ))}
                     </div>
                     <Button onClick={() => handleDayClick(dayOfMonth)} className="absolute bottom-1 right-1 text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">+</Button>
@@ -122,7 +122,7 @@ const CalendarView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                      <div className="text-xs mt-2 space-y-1 overflow-y-auto flex-grow">
                         {dayData.title && <div className="bg-purple-600 text-white font-bold rounded px-1 py-0.5 truncate">{dayData.title}</div>}
                         {dayData && filteredTasks(dayData.goals).map((task, idx) => (
-                             <li key={idx} className={`list-none truncate ${task.completed ? 'text-gray-500 line-through' : (task.type === 'event' ? 'text-yellow-400' : 'text-cyan-300')}`}>{task.text}</li>
+                             <div key={idx} className={`text-xs truncate ${task.completed ? 'text-gray-500 line-through' : (task.type === 'event' ? 'text-yellow-400' : 'text-cyan-300')}`}>{task.text}</div>
                         ))}
                     </div>
                      <Button onClick={() => handleDayClick(date)} className="absolute bottom-1 right-1 text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">+</Button>
