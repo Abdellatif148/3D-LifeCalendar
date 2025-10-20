@@ -44,27 +44,43 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate, targetAg
         const lowerQuery = query.toLowerCase();
         const lowerText = item.text.toLowerCase();
 
-        // Match Score
+        // Match Score (enhanced)
         if (lowerText.includes(lowerQuery)) {
-            score += 10; // Base match
-            if (lowerText === lowerQuery) score += 20; // Exact match bonus
-            if (lowerText.startsWith(lowerQuery)) score += 10; // Starts with bonus
+            score += 10;
+            if (lowerText === lowerQuery) score += 30;
+            if (lowerText.startsWith(lowerQuery)) score += 15;
+            const matchPosition = lowerText.indexOf(lowerQuery);
+            if (matchPosition === 0) score += 10;
         }
-        
-        // Type Score (Higher is better)
-        const typeWeights: Record<SearchResultType, number> = { year: 5, month: 4, week: 3, day: 2, goal: 1 };
-        score += (typeWeights[item.type] || 1) * 10;
 
-        // Recency Score (Higher for closer to current age)
-        const yearDifference = Math.abs(item.year - (currentAge - 1));
-        const recencyScore = 100 / (1 + yearDifference * yearDifference);
+        // Type Score with hierarchy preference
+        const typeWeights: Record<SearchResultType, number> = { year: 6, month: 5, week: 4, day: 3, goal: 2 };
+        score += (typeWeights[item.type] || 1) * 12;
+
+        // Recency Score (prioritize more recent entries)
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const yearDifference = Math.abs(item.year - currentYear);
+        const recencyScore = 120 / (1 + yearDifference * 0.5);
         score += recencyScore;
 
-        // Date-based search bonus
-        const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
+        // Temporal proximity bonus
+        const daysDifference = Math.abs(item.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysDifference < 7) score += 40;
+        else if (daysDifference < 30) score += 25;
+        else if (daysDifference < 90) score += 10;
+
+        // Date-based search bonus (enhanced)
+        const monthNames = ['january', 'february', 'march', 'april', 'may', 'june',
                            'july', 'august', 'september', 'october', 'november', 'december'];
         const monthIndex = monthNames.findIndex(month => lowerQuery.includes(month));
         if (monthIndex !== -1 && item.month === monthIndex) {
+            score += 60;
+        }
+
+        // Year search bonus
+        const yearMatch = lowerQuery.match(/\b(20\d{2})\b/);
+        if (yearMatch && parseInt(yearMatch[1]) === item.year) {
             score += 50;
         }
 
@@ -170,14 +186,14 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate, targetAg
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setIsOpen(true)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-md pl-3 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full bg-gray-700 border border-gray-600 rounded-md pl-3 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200"
             />
             {isOpen && results.length > 0 && (
                 <ul className="absolute top-full mt-2 w-full bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50 max-h-80 overflow-y-auto">
                     {results.map((result, index) => (
                         <li key={index}
                             onMouseDown={() => handleNavigate(result)}
-                            className="px-4 py-2 hover:bg-purple-600 cursor-pointer"
+                            className="px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-150"
                         >
                             <p className="font-semibold text-white truncate">{result.text}</p>
                             <p className="text-xs text-gray-400 truncate">{result.context}</p>

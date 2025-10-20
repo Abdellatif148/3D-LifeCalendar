@@ -73,7 +73,7 @@ const YearView: React.FC<YearViewProps> = ({ year, onBack, initialMonth, initial
                                     const dayIndex = (firstDay + dayOfMonth - 1) % 7;
                                     setSelectedDay({ month: monthIndex, week: weekIndex, day: dayIndex, dayOfMonth })
                                 }}
-                                className={`p-1 h-12 flex flex-col items-center justify-center rounded-md cursor-pointer transition-colors ${selectedDay?.dayOfMonth === dayOfMonth && selectedDay?.month === monthIndex ? 'bg-purple-600' : 'bg-gray-700 hover:bg-gray-600'}`}
+                                className={`p-1 h-12 flex flex-col items-center justify-center rounded-md cursor-pointer transition-all duration-200 ${selectedDay?.dayOfMonth === dayOfMonth && selectedDay?.month === monthIndex ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-gray-700 hover:bg-gray-600 hover:shadow-md hover:scale-105'}`}
                             >
                                 <span className="text-sm font-bold">{dayOfMonth}</span>
                                 {hasGoals && (
@@ -99,7 +99,7 @@ const YearView: React.FC<YearViewProps> = ({ year, onBack, initialMonth, initial
                     type="text"
                     value={yearData.title}
                     onChange={handleTitleChange}
-                    className="text-xl font-bold text-white bg-transparent text-center focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-md px-2"
+                    className="text-xl font-bold text-white bg-transparent text-center focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 transition-all duration-200 hover:bg-gray-800/50"
                 />
                 <div className="w-48 text-right text-gray-400">Age: {year + 1}</div>
             </header>
@@ -195,20 +195,20 @@ const DayDetailView: React.FC<DayDetailViewProps> = ({ day, dayData, onUpdate, o
                  <Button onClick={onClose} variant="secondary" className="px-2 py-1 text-xs">&times;</Button>
             </div>
             <div className="mb-4">
-                <label className="text-sm font-bold text-purple-400">Main Focus</label>
+                <label className="text-sm font-bold text-blue-400">Main Focus</label>
                 <input
                     type="text"
                     value={localDayData.title}
                     onChange={handleTitleChange}
                     placeholder="Set a main goal for the day..."
-                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200"
                 />
             </div>
             <div className="flex-grow space-y-2 overflow-y-auto">
                  <h3 className="text-sm font-bold text-gray-400">Tasks</h3>
                 {localDayData.goals.map((task, index) => (
-                    <div key={index} className={`group flex items-center p-3 rounded-md transition-all duration-200 hover:bg-gray-600/50 ${task.completed ? 'bg-gray-700/30' : 'bg-gray-700'}`}>
-                        <input type="checkbox" checked={task.completed} onChange={() => handleToggleTask(index)} className="h-5 w-5 rounded bg-gray-600 border-gray-500 text-purple-500 focus:ring-purple-600 flex-shrink-0"/>
+                    <div key={index} className={`group flex items-center p-3 rounded-md transition-all duration-200 hover:bg-gray-600/50 hover:shadow-sm ${task.completed ? 'bg-gray-700/30' : 'bg-gray-700'}`}>
+                        <input type="checkbox" checked={task.completed} onChange={() => handleToggleTask(index)} className="h-5 w-5 rounded bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-600 flex-shrink-0 transition-all duration-200 hover:scale-110"/>
                         {editingIndex === index ? (
                             <input
                                 type="text"
@@ -217,7 +217,7 @@ const DayDetailView: React.FC<DayDetailViewProps> = ({ day, dayData, onUpdate, o
                                 onBlur={() => handleUpdateTask(index)}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateTask(index); if (e.key === 'Escape') setEditingIndex(null); }}
                                 autoFocus
-                                className="ml-3 flex-grow bg-gray-600 text-white rounded px-2 py-1 outline-none ring-2 ring-purple-500"
+                                className="ml-3 flex-grow bg-gray-600 text-white rounded px-2 py-1 outline-none ring-2 ring-blue-500 transition-all duration-200"
                             />
                         ) : (
                             <span 
@@ -245,7 +245,7 @@ const DayDetailView: React.FC<DayDetailViewProps> = ({ day, dayData, onUpdate, o
                     onChange={e => setNewTaskText(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleAddTask()}
                     placeholder="Add a new task..."
-                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200"
                 />
                 <Button onClick={handleAddTask} className="w-full mt-2" disabled={!newTaskText.trim()}>Add Task</Button>
             </div>
