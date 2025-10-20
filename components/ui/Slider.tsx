@@ -32,8 +32,8 @@ const Slider: React.FC<SliderProps> = ({ label, valueLabel, color, style, title,
                 .slider::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
-                    width: 16px;
-                    height: 16px;
+                    width: 24px;
+                    height: 24px;
                     background: var(--thumb-color);
                     border-radius: 50%;
                     cursor: pointer;
@@ -41,8 +41,8 @@ const Slider: React.FC<SliderProps> = ({ label, valueLabel, color, style, title,
                 }
 
                 .slider::-moz-range-thumb {
-                    width: 16px;
-                    height: 16px;
+                    width: 24px;
+                    height: 24px;
                     background: var(--thumb-color);
                     border-radius: 50%;
                     cursor: pointer;
