@@ -82,9 +82,9 @@ const AppContent: React.FC = () => {
     }
 
     return (
-        <div className="bg-gray-900 text-white min-h-screen">
+        <main className="bg-gray-900 text-white min-h-screen">
             {currentView}
-        </div>
+        </main>
     );
 };
 
