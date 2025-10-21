@@ -180,26 +180,31 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate, targetAg
 
     return (
         <div className="relative w-64" onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
-            <input
-                type="search"
-                placeholder="Search goals, events, dates..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setIsOpen(true)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-md pl-3 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200"
-            />
+            <div className="relative">
+                <input
+                    type="search"
+                    placeholder="Search goals, events, dates..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setIsOpen(true)}
+                    className="input-clean pl-10 text-sm"
+                />
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
             {isOpen && results.length > 0 && (
-                <ul className="absolute top-full mt-2 w-full bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-soft-lg z-50 max-h-80 overflow-y-auto scrollbar-clean">
                     {results.map((result, index) => (
-                        <li key={index}
+                        <div key={index}
                             onMouseDown={() => handleNavigate(result)}
-                            className="px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-150"
+                            className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-150 first:rounded-t-xl last:rounded-b-xl"
                         >
-                            <p className="font-semibold text-white truncate">{result.text}</p>
-                            <p className="text-xs text-gray-400 truncate">{result.context}</p>
-                        </li>
+                            <p className="font-medium text-gray-900 dark:text-white text-sm truncate">{result.text}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">{result.context}</p>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );

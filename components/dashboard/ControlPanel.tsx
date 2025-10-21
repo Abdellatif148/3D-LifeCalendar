@@ -34,7 +34,7 @@ const ControlPanel: React.FC<ControlPanelProps> = React.memo(({ activities, onSl
     }, [deltas, yearsLeft]);
 
     const gainOrLossText = totalDeltaMinutes >= 0 ? 'Gained' : 'Lost';
-    const gainOrLossColor = totalDeltaMinutes >= 0 ? 'text-green-400' : 'text-red-400';
+    const gainOrLossColor = totalDeltaMinutes >= 0 ? 'text-accent-500' : 'text-red-500';
 
     const handleAddGoal = (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,48 +47,48 @@ const ControlPanel: React.FC<ControlPanelProps> = React.memo(({ activities, onSl
 
     return (
         <div className="space-y-6">
-            <Card>
-                <h3 className="text-lg font-bold mb-4">Daily Breakdown</h3>
-                 <div className="flex flex-col items-center gap-4 mb-4">
-                    <PieChart data={pieData} size={140} />
+            <Card variant="elevated" padding="lg">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Daily Breakdown</h3>
+                <div className="flex flex-col items-center gap-6 mb-6">
+                    <PieChart data={pieData} size={160} />
                 </div>
-                <ul className="space-y-2">
+                <div className="space-y-3">
                     {activities.map(act => (
-                        <li key={act.name} className="flex justify-between items-center text-sm">
-                            <span className="flex items-center">
-                                <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: CATEGORY_MAP[act.name].color }}></span>
-                                {act.name}
+                        <div key={act.name} className="flex justify-between items-center py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                            <span className="flex items-center gap-3">
+                                <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: CATEGORY_MAP[act.name].color }}></span>
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">{act.name}</span>
                             </span>
-                            <div className="flex items-center gap-4">
-                               <span className="font-semibold text-gray-300 w-16 text-right">{((act.minutesPerDay / MINUTES_IN_DAY) * 100).toFixed(1)}%</span>
-                               <span className="font-semibold w-20 text-right">{act.displayTime}</span>
+                            <div className="flex items-center gap-4 text-sm">
+                               <span className="font-semibold text-gray-600 dark:text-gray-300 w-12 text-right">{((act.minutesPerDay / MINUTES_IN_DAY) * 100).toFixed(1)}%</span>
+                               <span className="font-semibold text-gray-900 dark:text-white w-16 text-right">{act.displayTime}</span>
                             </div>
-                        </li>
+                        </div>
                     ))}
-                </ul>
-                <div className="border-t border-gray-700 mt-4 pt-4 space-y-3">
-                    <h4 className="text-md font-bold text-center">Lifetime Impact</h4>
-                    <div className="flex justify-around">
-                         <div className="text-center">
-                            <p className="text-xs text-gray-400">Annual Hours {gainOrLossText}</p>
+                </div>
+                <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6">
+                    <h4 className="text-base font-semibold text-center text-gray-900 dark:text-white mb-4">Lifetime Impact</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                         <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Annual Hours {gainOrLossText}</p>
                             <p className={`text-2xl font-bold ${gainOrLossColor}`}>{annualHoursGained.toFixed(1)}</p>
                         </div>
-                        <div className="text-center">
-                            <p className="text-xs text-gray-400">Lifetime Days {gainOrLossText}</p>
+                        <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Lifetime Days {gainOrLossText}</p>
                             <p className={`text-2xl font-bold ${gainOrLossColor}`}>{lifetimeDaysGained.toFixed(1)}</p>
                         </div>
                     </div>
                 </div>
             </Card>
 
-            <Card>
-                <h3 className="text-lg font-bold mb-4">Goal Setting</h3>
-                <p className="text-sm text-gray-400 mb-4">Simulate a daily change to see its long-term impact on your life.</p>
+            <Card variant="elevated" padding="lg">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Goal Setting</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Simulate a daily change to see its long-term impact on your life.</p>
                 <form onSubmit={handleAddGoal} className="space-y-4">
                     <select
                         value={goalActivity}
                         onChange={(e) => setGoalActivity(e.target.value as CategoryName)}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        className="input-clean"
                     >
                         {goalableActivities.map(act => (
                             <option key={act.name} value={act.name}>{act.name}</option>
@@ -105,24 +105,32 @@ const ControlPanel: React.FC<ControlPanelProps> = React.memo(({ activities, onSl
                         value={goalMinutes}
                         onChange={(e) => setGoalMinutes(parseInt(e.target.value, 10))}
                     />
-                    <Button type="submit" className="w-full">Add/Update Goal</Button>
+                    <Button type="submit" fullWidth>Add/Update Goal</Button>
                 </form>
                 {deltas && deltas.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                        <h4 className="font-semibold text-sm">Active Goals:</h4>
-                        <ul className="space-y-1">
+                    <div className="mt-6 space-y-3">
+                        <h4 className="font-semibold text-sm text-gray-900 dark:text-white">Active Goals:</h4>
+                        <div className="space-y-2">
                             {deltas.map(delta => (
-                                <li key={delta.name} className="flex justify-between items-center text-sm bg-gray-700/50 p-2 rounded-md">
-                                    <span className="flex items-center">
-                                        <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: CATEGORY_MAP[delta.name].color }}></span>
-                                        {delta.name}: <span className="font-bold ml-1">{delta.deltaMinutes > 0 ? '+' : ''}{delta.deltaMinutes} min</span>
+                                <div key={delta.name} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                    <span className="flex items-center gap-3">
+                                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CATEGORY_MAP[delta.name].color }}></span>
+                                        <span className="text-sm text-gray-900 dark:text-white">
+                                            {delta.name}: <span className="font-semibold">{delta.deltaMinutes > 0 ? '+' : ''}{delta.deltaMinutes} min</span>
+                                        </span>
                                     </span>
-                                    <button onClick={() => handleRemoveGoal(delta.name)} className="text-gray-400 hover:text-red-500 font-bold transition-colors">
-                                        &#x2715;
+                                    <button 
+                                        onClick={() => handleRemoveGoal(delta.name)} 
+                                        className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
+                                        title="Remove goal"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                     </button>
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     </div>
                 )}
             </Card>

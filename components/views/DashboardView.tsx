@@ -170,37 +170,43 @@ const DashboardView: React.FC<DashboardViewProps> = ({ onReset, onSettings }) =>
 
     return (
         <>
-            <div style={{ display: mainDashboardVisible ? 'flex' : 'none' }} className="flex-col h-screen bg-gray-900 overflow-hidden">
-                <header className="flex-shrink-0 bg-gray-900/80 backdrop-blur-sm z-20 p-3 flex flex-wrap justify-between items-center border-b border-gray-700 gap-2">
-                    <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">3D Time Optimizer</h1>
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <GlobalSearch onNavigate={handleSearchNavigate} targetAge={lifeData.targetAge} currentAge={lifeData.currentAge} />
-                        <Button onClick={() => handleNav('guide')} variant="secondary" size="sm">Guide</Button>
-                        <Button onClick={() => handleNav('calendar')} variant="secondary" size="sm">Calendar</Button>
-                        <Button onClick={() => handleNav('notes')} variant="secondary" size="sm">Notes</Button>
-                        <Button onClick={onSettings} variant="secondary" size="sm" aria-label="Settings">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </Button>
-                        <Button onClick={onReset} variant="secondary" size="sm">Reset</Button>
-                        <Button onClick={handleLogout} variant="secondary" size="sm" loading={isLoading}>
-                            {isLoading ? <LoadingSpinner size="sm" color="white" /> : 'Logout'}
-                        </Button>
+            <div style={{ display: mainDashboardVisible ? 'flex' : 'none' }} className="flex-col h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+                <header className="nav-clean space-container">
+                    <div className="flex flex-wrap justify-between items-center py-4 gap-4">
+                        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                            3D Time Optimizer
+                        </h1>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <GlobalSearch onNavigate={handleSearchNavigate} targetAge={lifeData.targetAge} currentAge={lifeData.currentAge} />
+                            <Button onClick={() => handleNav('guide')} variant="ghost" size="sm">Guide</Button>
+                            <Button onClick={() => handleNav('calendar')} variant="ghost" size="sm">Calendar</Button>
+                            <Button onClick={() => handleNav('notes')} variant="ghost" size="sm">Notes</Button>
+                            <Button onClick={onSettings} variant="ghost" size="sm" aria-label="Settings">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </Button>
+                            <Button onClick={onReset} variant="secondary" size="sm">Reset</Button>
+                            <Button onClick={handleLogout} variant="secondary" size="sm" loading={isLoading}>
+                                {isLoading ? 'Signing out...' : 'Sign out'}
+                            </Button>
+                        </div>
                     </div>
                 </header>
-                <div className="flex-grow flex flex-col md:flex-row overflow-hidden">
-                    <main className="flex-grow relative order-2 md:order-1" role="main" aria-label="3D Life Visualization">
+                
+                <div className="flex-grow flex flex-col lg:flex-row overflow-hidden">
+                    <main className="flex-grow relative order-2 lg:order-1 bg-white dark:bg-gray-900" role="main" aria-label="3D Life Visualization">
                         <LifeGrid3D currentAge={lifeData.currentAge} targetAge={lifeData.targetAge} dominantColorActivity={dominantColorActivity} onYearClick={handleYearClick} deltas={deltas} />
                     </main>
-                    <aside className="w-full md:w-96 bg-gray-800/50 backdrop-blur-sm border-l border-gray-700/50 p-4 overflow-y-auto order-1 md:order-2" role="complementary" aria-label="Control Panel">
+                    <aside className="w-full lg:w-96 bg-gray-50 dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-6 overflow-y-auto scrollbar-clean order-1 lg:order-2" role="complementary" aria-label="Control Panel">
                         <div className="space-y-6">
                             <ControlPanel activities={modifiedActivities} onSliderChange={handleSliderChange} deltas={deltas} yearsLeft={yearsLeft} />
                             <MetricsPanel lifeData={lifeData} deltas={deltas} />
                         </div>
                     </aside>
                 </div>
+                
                 <div className="fixed top-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] space-y-2" role="region" aria-label="Notifications">
                     {notifications.map(n => <NotificationToast key={n.id} notification={n} onClose={() => closeNotification(n.id)} />)}
                 </div>

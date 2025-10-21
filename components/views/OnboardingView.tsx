@@ -46,32 +46,34 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
     const unallocatedHours = (localData.activities.find(a => a.name === 'Unallocated')?.minutesPerDay ?? 0) / 60;
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-900">
-            <Card className="w-full max-w-2xl">
-                <h2 className="text-3xl font-bold text-center mb-2 text-white">Your Life, by the Numbers</h2>
-                <p className="text-center text-gray-400 mb-6">Let's set up your baseline. How do you spend a typical day?</p>
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+            <Card variant="elevated" padding="xl" className="w-full max-w-2xl">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">Your Life, by the Numbers</h2>
+                    <p className="text-gray-600 dark:text-gray-400 text-lg">Let's set up your baseline. How do you spend a typical day?</p>
+                </div>
                 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Current Age</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Age</label>
                             <input
                                 type="number"
                                 value={localData.currentAge}
                                 onChange={e => setLocalData({ ...localData, currentAge: parseInt(e.target.value, 10) || 0 })}
-                                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                className="input-clean"
                                 required
                                 min="1"
                                 max="100"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Target Age</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Target Age</label>
                             <input
                                 type="number"
                                 value={localData.targetAge}
                                 onChange={e => setLocalData({ ...localData, targetAge: parseInt(e.target.value, 10) || 0 })}
-                                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                className="input-clean"
                                 required
                                 min={localData.currentAge + 1}
                                 max="120"
@@ -79,10 +81,11 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-5">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Daily Time Allocation</h3>
                         {localData.activities.filter(a => a.name !== 'Unallocated').map(activity => (
-                             <div key={activity.name}>
-                                 <label className="block text-sm font-medium text-gray-300 mb-1" style={{color: CATEGORY_MAP[activity.name].color}}>
+                             <div key={activity.name} className="space-y-2">
+                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" style={{color: CATEGORY_MAP[activity.name].color}}>
                                      {activity.name} (hours per day)
                                  </label>
                                  <input
@@ -90,7 +93,7 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                                      step="0.5"
                                      value={activity.minutesPerDay / 60}
                                      onChange={e => handleActivityChange(activity.name, parseFloat(e.target.value) || 0)}
-                                     className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                     className="input-clean"
                                      required
                                      min="0"
                                      max="24"
@@ -99,17 +102,16 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                         ))}
                     </div>
 
-                    <div className="text-center bg-gray-700 p-3 rounded-md">
-                        <p className="font-semibold">
-                            Unallocated time: <span className="font-bold text-lg" style={{color: CATEGORY_MAP['Unallocated'].color}}>{unallocatedHours.toFixed(1)} hours/day</span>
+                    <Card variant="outlined" padding="lg" className="text-center">
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                            Unallocated time: <span className="text-2xl font-bold" style={{color: CATEGORY_MAP['Unallocated'].color}}>{unallocatedHours.toFixed(1)} hours/day</span>
                         </p>
-                    </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">This includes commuting, chores, and other daily activities</p>
+                    </Card>
 
-                    <div className="pt-4">
-                        <Button type="submit" className="w-full text-lg">
-                            Visualize My Life
-                        </Button>
-                    </div>
+                    <Button type="submit" size="xl" fullWidth>
+                        Visualize My Life
+                    </Button>
                 </form>
             </Card>
         </div>
