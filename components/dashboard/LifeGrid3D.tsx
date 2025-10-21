@@ -4,6 +4,7 @@ import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { CATEGORY_MAP } from '../../constants';
 import type { CategoryName, Delta } from '../../types';
+import LoadingSpinner from '../ui/LoadingSpinner';
 
 interface YearBlockProps {
     position: [number, number, number];
@@ -49,8 +50,8 @@ const LifeGrid: React.FC<LifeGridProps> = ({ currentAge, targetAge, dominantColo
 
     const { years, gridDimensions } = useMemo(() => {
         const grid = [];
-        const pastColor = "#4B5563"; // Dim gray
-        const currentColor = "#34D399"; // Green
+        const pastColor = "#4B5563";
+        const currentColor = "#34D399";
         const futureColor = CATEGORY_MAP[dominantColorActivity].color;
         
         const totalDeltaMinutes = deltas.reduce((sum, delta) => sum + delta.deltaMinutes, 0);
@@ -107,7 +108,6 @@ const LifeGrid: React.FC<LifeGridProps> = ({ currentAge, targetAge, dominantColo
                         e.stopPropagation();
                         let title = '';
                         try {
-                            // This should be handled by the TimeData context
                             title = `Year ${y.year + 1}`;
                         } catch (error) {
                             console.error("Failed to parse year data for tooltip", error)
@@ -167,28 +167,82 @@ const LifeGrid: React.FC<LifeGridProps> = ({ currentAge, targetAge, dominantColo
     );
 };
 
+const CanvasErrorBoundary: React.FC<{ children: React.ReactNode; fallback: React.ReactNode }> = ({ children, fallback }) => {
+    const [hasError, setHasError] = React.useState(false);
+    
+    React.useEffect(() => {
+        const handleError = () => setHasError(true);
+        window.addEventListener('error', handleError);
+        return () => window.removeEventListener('error', handleError);
+    }, []);
+    
+    if (hasError) {
+        return <>{fallback}</>;
+    }
+    
+    return <>{children}</>;
+};
+
 const LifeGrid3D: React.FC<LifeGridProps> = (props) => {
+    const [isLoading, setIsLoading] = React.useState(true);
+    
+    const handleCreated = () => {
+        setIsLoading(false);
+    };
+    
+    const fallback = (
+        <div className="flex items-center justify-center h-full bg-gray-900 text-white">
+            <div className="text-center">
+                <p className="text-lg mb-4">Unable to load 3D visualization</p>
+                <p className="text-sm text-gray-400">Your browser may not support WebGL</p>
+            </div>
+        </div>
+    );
+    
     return (
-        <Canvas 
-            camera={{ position: [0, 0, 25], fov: 50 }}
-            style={{ background: 'transparent' }}
-            gl={{ antialias: true, alpha: true }}
-            dpr={[1, 2]}
-        >
-            <ambientLight intensity={0.8} />
-            <pointLight position={[0, 10, 20]} intensity={1.5} />
-            <pointLight position={[0, -10, -20]} intensity={0.5} color="#8B5CF6" />
-            <LifeGrid {...props} />
-            <OrbitControls 
-                enableZoom={true} 
-                enablePan={true}
-                minDistance={10}
-                maxDistance={60}
-                zoomSpeed={0.8}
-                enableDamping={true}
-                dampingFactor={0.05}
-            />
-        </Canvas>
+        <div className="relative h-full w-full">
+            {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-900 z-10">
+                    <div className="text-center">
+                        <LoadingSpinner size="lg" />
+                        <p className="text-white mt-4">Loading 3D visualization...</p>
+                    </div>
+                </div>
+            )}
+            <CanvasErrorBoundary fallback={fallback}>
+                <Canvas 
+                    camera={{ position: [0, 0, 25], fov: 50 }}
+                    style={{ background: 'transparent' }}
+                    gl={{ 
+                        antialias: true, 
+                        alpha: true,
+                        powerPreference: "high-performance",
+                        failIfMajorPerformanceCaveat: false
+                    }}
+                    dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+                    onCreated={handleCreated}
+                    aria-label="3D Life Grid Visualization"
+                >
+                    <ambientLight intensity={0.8} />
+                    <pointLight position={[0, 10, 20]} intensity={1.5} />
+                    <pointLight position={[0, -10, -20]} intensity={0.5} color="#8B5CF6" />
+                    <LifeGrid {...props} />
+                    <OrbitControls 
+                        enableZoom={true} 
+                        enablePan={true}
+                        minDistance={10}
+                        maxDistance={60}
+                        zoomSpeed={0.8}
+                        enableDamping={true}
+                        dampingFactor={0.05}
+                        touches={{
+                            ONE: THREE.TOUCH.ROTATE,
+                            TWO: THREE.TOUCH.DOLLY_PAN
+                        }}
+                    />
+                </Canvas>
+            </CanvasErrorBoundary>
+        </div>
     );
 };
 

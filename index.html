@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -55,18 +55,55 @@
       ]
     }
     </script>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" as="style">
+    <link rel="preload" href="/index.tsx" as="script">
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://aistudiocdn.com">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+    </noscript>
+    
     <style>
+      /* Critical CSS for initial render */
       body {
         font-family: 'Inter', sans-serif;
         margin: 0;
         padding: 0;
+        background-color: #111827;
+        color: #ffffff;
+        min-height: 100vh;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading state styles */
+      .loading-spinner {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid #374151;
+        border-radius: 50%;
+        border-top-color: #8b5cf6;
+        animation: spin 1s ease-in-out infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
       }
     </style>
-  <script type="importmap">
+    
+    <script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.1.1",
@@ -79,10 +116,18 @@
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.469.0"
   }
 }
-</script>
+    </script>
 </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+  <body class="h-full">
+    <main id="root" role="main" aria-label="3D Time Optimizer Application"></main>
+    <script type="module" src="/index.tsx" defer></script>
+    
+    <!-- Fallback for users with JavaScript disabled -->
+    <noscript>
+      <div style="text-align: center; padding: 2rem; background: #111827; color: #ffffff; min-height: 100vh;">
+        <h1>3D Time Optimizer</h1>
+        <p>This application requires JavaScript to function properly. Please enable JavaScript in your browser.</p>
+      </div>
+    </noscript>
   </body>
 </html>

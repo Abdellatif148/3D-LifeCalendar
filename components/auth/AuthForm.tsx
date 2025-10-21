@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import LoadingSpinner from '../ui/LoadingSpinner';
 
 interface AuthFormProps {
   onSuccess?: () => void;
@@ -55,8 +56,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
-      <Card className="w-full max-w-md p-8">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4 py-8">
+      <Card variant="elevated" className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
@@ -78,9 +79,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 min-h-[48px]"
               placeholder="you@example.com"
               disabled={loading}
+              autoComplete="email"
+              required
             />
           </div>
 
@@ -93,9 +96,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 min-h-[48px]"
               placeholder="••••••••"
               disabled={loading}
+              autoComplete={isSignUp ? "new-password" : "current-password"}
+              required
             />
           </div>
 
@@ -109,25 +114,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 min-h-[48px]"
                 placeholder="••••••••"
                 disabled={loading}
+                autoComplete="new-password"
+                required
               />
             </div>
           )}
 
           {error && (
-            <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm">
+            <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm" role="alert">
               {error}
             </div>
           )}
 
           <Button
             type="submit"
-            className="w-full py-3"
+            size="lg"
+            className="w-full"
+            loading={loading}
             disabled={loading}
           >
-            {loading ? 'Please wait...' : isSignUp ? 'Sign Up' : 'Sign In'}
+            {isSignUp ? 'Sign Up' : 'Sign In'}
           </Button>
         </form>
 
@@ -139,7 +148,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               setPassword('');
               setConfirmPassword('');
             }}
-            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+            className="text-purple-400 hover:text-purple-300 text-sm transition-colors duration-200 min-h-[32px] px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
             disabled={loading}
           >
             {isSignUp
@@ -148,7 +157,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
           </button>
         </div>
       </Card>
-    </div>
+    </main>
   );
 };
 
