@@ -213,13 +213,13 @@ const LifeGrid3D: React.FC<LifeGridProps> = (props) => {
                 <Canvas 
                     camera={{ position: [0, 0, 25], fov: 50 }}
                     style={{ background: 'transparent' }}
-                    gl={{ 
-                        antialias: true, 
+                    gl={{
+                        antialias: window.innerWidth > 768,
                         alpha: true,
                         powerPreference: "high-performance",
                         failIfMajorPerformanceCaveat: false
                     }}
-                    dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+                    dpr={[1, Math.min(window.devicePixelRatio, 1.5)]}
                     onCreated={handleCreated}
                     aria-label="3D Life Grid Visualization"
                 >

@@ -63,20 +63,25 @@ export const TimeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 if (user) {
                     const years = Object.keys(timeData).map(Number);
 
-                    for (const year of years) {
-                        const { error } = await supabase
-                            .from('time_data')
-                            .upsert({
-                                user_id: user.id,
-                                year,
-                                data: timeData[year],
-                            }, {
-                                onConflict: 'user_id,year'
-                            });
-
-                        if (error) {
-                            console.error(`Error saving time data for year ${year}:`, error);
-                        }
+                    const batchSize = 5;
+                    for (let i = 0; i < years.length; i += batchSize) {
+                        const batch = years.slice(i, i + batchSize);
+                        await Promise.all(batch.map(year =>
+                            supabase
+                                .from('time_data')
+                                .upsert({
+                                    user_id: user.id,
+                                    year,
+                                    data: timeData[year],
+                                }, {
+                                    onConflict: 'user_id,year'
+                                })
+                                .then(({ error }) => {
+                                    if (error) {
+                                        console.error(`Error saving time data for year ${year}:`, error);
+                                    }
+                                })
+                        ));
                     }
                 } else {
                     localStorage.setItem('timeData', JSON.stringify(timeData));
@@ -86,7 +91,8 @@ export const TimeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
         };
 
-        saveTimeData();
+        const timeoutId = setTimeout(saveTimeData, 500);
+        return () => clearTimeout(timeoutId);
     }, [timeData, isInitialized]);
     
     const getYearData = useCallback((year: number): YearData => {

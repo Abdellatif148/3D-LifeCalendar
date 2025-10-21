@@ -107,7 +107,8 @@ export const LifeDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
         };
 
-        saveLifeData();
+        const timeoutId = setTimeout(saveLifeData, 300);
+        return () => clearTimeout(timeoutId);
     }, [lifeData, isInitialized]);
 
     const updateActivity = useCallback((name: CategoryName, minutes: number) => {

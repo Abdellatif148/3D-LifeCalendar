@@ -13,14 +13,14 @@ interface ControlPanelProps {
     yearsLeft: number;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ activities, onSliderChange, deltas, yearsLeft }) => {
-    const pieData = activities
+const ControlPanel: React.FC<ControlPanelProps> = React.memo(({ activities, onSliderChange, deltas, yearsLeft }) => {
+    const pieData = useMemo(() => activities
         .filter(act => act.minutesPerDay > 0)
         .map(act => ({
             name: act.name,
             value: act.minutesPerDay,
             color: CATEGORY_MAP[act.name].color,
-        }));
+        })), [activities]);
 
     const goalableActivities = activities.filter(a => a.name !== 'Unallocated' && a.name !== 'Sleep');
     const [goalActivity, setGoalActivity] = useState<CategoryName>(goalableActivities[0]?.name || 'Exercise');
@@ -128,6 +128,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activities, onSliderChange,
             </Card>
         </div>
     );
-};
+});
+
+ControlPanel.displayName = 'ControlPanel';
 
 export default ControlPanel;
